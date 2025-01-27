@@ -22,8 +22,8 @@ export function ContactsTab({ form }: ContactsTabProps) {
           <FormItem>
             <FormLabel>Landlords</FormLabel>
             <ContactSelect
-              value={field.value?.[0] || ""}
-              onChange={(value) => field.onChange([value])}
+              value={field.value || []}
+              onChange={(value) => field.onChange(value)}
               contactType="landlord"
               placeholder="Select landlord..."
             />
@@ -39,8 +39,8 @@ export function ContactsTab({ form }: ContactsTabProps) {
           <FormItem>
             <FormLabel>Property Managers</FormLabel>
             <ContactSelect
-              value={field.value?.[0] || ""}
-              onChange={(value) => field.onChange([value])}
+              value={field.value || []}
+              onChange={(value) => field.onChange(value)}
               contactType="property_manager"
               placeholder="Select property manager..."
             />
@@ -56,8 +56,8 @@ export function ContactsTab({ form }: ContactsTabProps) {
           <FormItem>
             <FormLabel>Site Contacts</FormLabel>
             <ContactSelect
-              value={field.value?.[0] || ""}
-              onChange={(value) => field.onChange([value])}
+              value={field.value || []}
+              onChange={(value) => field.onChange(value)}
               placeholder="Select site contact..."
             />
             <FormMessage />
