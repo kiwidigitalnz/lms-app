@@ -308,15 +308,22 @@ export type Database = {
           description: string | null
           floor_area: number | null
           id: string
+          insurance_coverage_amount: number | null
           insurance_expiry_date: string | null
+          insurance_notes: string | null
+          insurance_policy_number: string | null
+          insurance_provider: string | null
           insurance_status: string | null
+          landlord_contact_id: string | null
           name: string
           notes: string | null
           oio_sensitive: boolean | null
           operational_consent_date: string | null
           ownership_status: string | null
+          property_manager_contact_id: string | null
           property_type: Database["public"]["Enums"]["property_type"]
           seismic_rating: string | null
+          site_contact_id: string | null
           tenant_id: string
           updated_at: string | null
           year_built: number | null
@@ -329,15 +336,22 @@ export type Database = {
           description?: string | null
           floor_area?: number | null
           id?: string
+          insurance_coverage_amount?: number | null
           insurance_expiry_date?: string | null
+          insurance_notes?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
           insurance_status?: string | null
+          landlord_contact_id?: string | null
           name: string
           notes?: string | null
           oio_sensitive?: boolean | null
           operational_consent_date?: string | null
           ownership_status?: string | null
+          property_manager_contact_id?: string | null
           property_type: Database["public"]["Enums"]["property_type"]
           seismic_rating?: string | null
+          site_contact_id?: string | null
           tenant_id: string
           updated_at?: string | null
           year_built?: number | null
@@ -350,20 +364,49 @@ export type Database = {
           description?: string | null
           floor_area?: number | null
           id?: string
+          insurance_coverage_amount?: number | null
           insurance_expiry_date?: string | null
+          insurance_notes?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
           insurance_status?: string | null
+          landlord_contact_id?: string | null
           name?: string
           notes?: string | null
           oio_sensitive?: boolean | null
           operational_consent_date?: string | null
           ownership_status?: string | null
+          property_manager_contact_id?: string | null
           property_type?: Database["public"]["Enums"]["property_type"]
           seismic_rating?: string | null
+          site_contact_id?: string | null
           tenant_id?: string
           updated_at?: string | null
           year_built?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "properties_landlord_contact_id_fkey"
+            columns: ["landlord_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "properties_property_manager_contact_id_fkey"
+            columns: ["property_manager_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "properties_site_contact_id_fkey"
+            columns: ["site_contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       property_compliance: {
         Row: {

@@ -1,6 +1,7 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
 import { PropertyFormValues } from "../PropertyForm";
 
@@ -17,9 +18,20 @@ export function ComplianceTab({ form }: ComplianceTabProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Seismic Rating</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select rating" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="A/A+">A/A+</SelectItem>
+                <SelectItem value="B">B</SelectItem>
+                <SelectItem value="C">C</SelectItem>
+                <SelectItem value="D">D</SelectItem>
+                <SelectItem value="NA">Not Applicable</SelectItem>
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}
@@ -32,16 +44,18 @@ export function ComplianceTab({ form }: ComplianceTabProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Asbestos Status</FormLabel>
-              <FormControl>
-                <select
-                  {...field}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="present">Present</option>
-                  <option value="not_present">Not Present</option>
-                  <option value="unknown">Unknown</option>
-                </select>
-              </FormControl>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="present">Present</SelectItem>
+                  <SelectItem value="not_present">Not Present</SelectItem>
+                  <SelectItem value="unknown">Unknown</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -53,16 +67,18 @@ export function ComplianceTab({ form }: ComplianceTabProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Contamination Status</FormLabel>
-              <FormControl>
-                <select
-                  {...field}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                  <option value="unknown">Unknown</option>
-                </select>
-              </FormControl>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                  <SelectItem value="unknown">Unknown</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

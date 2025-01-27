@@ -12,13 +12,21 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BasicInfoTab } from "./form/BasicInfoTab";
 import { DetailsTab } from "./form/DetailsTab";
 import { ComplianceTab } from "./form/ComplianceTab";
+import { InsuranceTab } from "./form/InsuranceTab";
 import { ImageUpload } from "./ImageUpload";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const propertySchema = z.object({
   name: z.string().min(1, "Property name is required"),
@@ -30,12 +38,19 @@ const propertySchema = z.object({
   ownership_status: z.enum(["owned", "leased", "managed"]),
   insurance_status: z.string().optional(),
   insurance_expiry_date: z.string().optional(),
-  seismic_rating: z.string().optional(),
+  seismic_rating: z.enum(["A/A+", "B", "C", "D", "NA"]),
   asbestos_status: z.enum(["present", "not_present", "unknown"]),
   contamination_status: z.enum(["yes", "no", "unknown"]),
   oio_sensitive: z.boolean().optional(),
   operational_consent_date: z.string().optional(),
   notes: z.string().optional(),
+  landlord_contact_id: z.string().optional(),
+  property_manager_contact_id: z.string().optional(),
+  site_contact_id: z.string().optional(),
+  insurance_provider: z.string().optional(),
+  insurance_policy_number: z.string().optional(),
+  insurance_coverage_amount: z.number().optional(),
+  insurance_notes: z.string().optional(),
 });
 
 export type PropertyFormValues = z.infer<typeof propertySchema>;
@@ -50,6 +65,19 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const { data: contacts } = useQuery({
+    queryKey: ["contacts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("*")
+        .order("first_name", { ascending: true });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
     defaultValues: initialData || {
@@ -62,12 +90,19 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       ownership_status: "owned",
       insurance_status: "",
       insurance_expiry_date: "",
-      seismic_rating: "",
+      seismic_rating: "NA",
       asbestos_status: "unknown",
       contamination_status: "unknown",
       oio_sensitive: false,
       operational_consent_date: "",
       notes: "",
+      landlord_contact_id: "",
+      property_manager_contact_id: "",
+      site_contact_id: "",
+      insurance_provider: "",
+      insurance_policy_number: "",
+      insurance_coverage_amount: undefined,
+      insurance_notes: "",
     },
   });
 
@@ -94,6 +129,13 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
         operational_consent_date: data.operational_consent_date,
         notes: data.notes,
         tenant_id: user.id,
+        landlord_contact_id: data.landlord_contact_id || null,
+        property_manager_contact_id: data.property_manager_contact_id || null,
+        site_contact_id: data.site_contact_id || null,
+        insurance_provider: data.insurance_provider,
+        insurance_policy_number: data.insurance_policy_number,
+        insurance_coverage_amount: data.insurance_coverage_amount,
+        insurance_notes: data.insurance_notes,
       };
 
       if (mode === "create") {
@@ -137,10 +179,12 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
+            <TabsTrigger value="insurance">Insurance</TabsTrigger>
+            <TabsTrigger value="contacts">Contacts</TabsTrigger>
           </TabsList>
           
           <TabsContent value="basic" className="space-y-4 mt-4">
@@ -153,6 +197,89 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
           
           <TabsContent value="compliance" className="space-y-4 mt-4">
             <ComplianceTab form={form} />
+          </TabsContent>
+
+          <TabsContent value="insurance" className="space-y-4 mt-4">
+            <InsuranceTab form={form} />
+          </TabsContent>
+
+          <TabsContent value="contacts" className="space-y-4 mt-4">
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="landlord_contact_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Landlord</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select landlord" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {contacts?.map((contact) => (
+                          <SelectItem key={contact.id} value={contact.id}>
+                            {contact.first_name} {contact.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="property_manager_contact_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Property Manager</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select property manager" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {contacts?.map((contact) => (
+                          <SelectItem key={contact.id} value={contact.id}>
+                            {contact.first_name} {contact.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="site_contact_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Site Contact</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select site contact" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {contacts?.map((contact) => (
+                          <SelectItem key={contact.id} value={contact.id}>
+                            {contact.first_name} {contact.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </TabsContent>
         </Tabs>
 
