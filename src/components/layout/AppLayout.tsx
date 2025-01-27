@@ -1,6 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { NotificationList } from "@/components/notifications/NotificationList";
+import { UserMenu } from "@/components/user/UserMenu";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -22,8 +23,9 @@ export function AppLayout({ children, title, description }: AppLayoutProps) {
                   <p className="text-muted-foreground">{description}</p>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
                 <NotificationList />
+                <UserMenu />
               </div>
             </div>
             {children}
