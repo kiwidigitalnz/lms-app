@@ -93,6 +93,45 @@ export type Database = {
           },
         ]
       }
+      lease_documents: {
+        Row: {
+          file_path: string
+          id: string
+          lease_id: string
+          name: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          file_path: string
+          id?: string
+          lease_id: string
+          name: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          file_path?: string
+          id?: string
+          lease_id?: string
+          name?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_lease"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lease_documents_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lease_notifications: {
         Row: {
           created_at: string | null

@@ -6,6 +6,9 @@ import { UseFormReturn } from "react-hook-form";
 import { Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Database } from "@/integrations/supabase/types";
+
+type LeaseDocument = Database['public']['Tables']['lease_documents']['Row'];
 
 interface DocumentsTabProps {
   form: UseFormReturn<any>;
@@ -15,7 +18,7 @@ interface DocumentsTabProps {
 export function DocumentsTab({ form, leaseId }: DocumentsTabProps) {
   const { toast } = useToast();
   const [uploading, setUploading] = React.useState(false);
-  const [documents, setDocuments] = React.useState<any[]>([]);
+  const [documents, setDocuments] = React.useState<LeaseDocument[]>([]);
 
   React.useEffect(() => {
     if (leaseId) {
