@@ -12,22 +12,16 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BasicInfoTab } from "./form/BasicInfoTab";
 import { DetailsTab } from "./form/DetailsTab";
 import { ComplianceTab } from "./form/ComplianceTab";
 import { EnvironmentalTab } from "./form/EnvironmentalTab";
 import { TechnicalTab } from "./form/TechnicalTab";
+import { ContactsTab } from "./form/ContactsTab";
 import { ImageUpload } from "./ImageUpload";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const propertySchema = z.object({
   name: z.string().min(1, "Property name is required"),
@@ -77,19 +71,6 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: contacts } = useQuery({
-    queryKey: ["contacts"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contacts")
-        .select("*")
-        .order("first_name", { ascending: true });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
     defaultValues: initialData || {
@@ -135,7 +116,6 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       
       if (!user) throw new Error("No user found");
 
-      // Ensure all required fields are present and properly typed
       const propertyData = {
         ...data,
         tenant_id: user.id,
@@ -218,82 +198,7 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
           </TabsContent>
 
           <TabsContent value="contacts" className="space-y-4 mt-4">
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="landlord_contact_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Landlord</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select landlord" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {contacts?.map((contact) => (
-                          <SelectItem key={contact.id} value={contact.id}>
-                            {contact.first_name} {contact.last_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="property_manager_contact_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Property Manager</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select property manager" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {contacts?.map((contact) => (
-                          <SelectItem key={contact.id} value={contact.id}>
-                            {contact.first_name} {contact.last_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="site_contact_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Site Contact</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select site contact" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {contacts?.map((contact) => (
-                          <SelectItem key={contact.id} value={contact.id}>
-                            {contact.first_name} {contact.last_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <ContactsTab form={form} />
           </TabsContent>
         </Tabs>
 
