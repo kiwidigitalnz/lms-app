@@ -31,9 +31,11 @@ export function AppSidebar() {
   return (
     <Sidebar className="fixed left-0 top-0 z-20 h-full">
       <SidebarContent>
-        <div className="relative">
-          <SidebarTrigger className="absolute right-2 top-2 z-50" />
-          <SidebarGroup>
+        <div className="relative h-full">
+          <div className="absolute right-0 top-0 p-2 z-50">
+            <SidebarTrigger />
+          </div>
+          <SidebarGroup className="mt-12">
             <SidebarGroupLabel className={state === "collapsed" ? "hidden" : ""}>
               Property Management
             </SidebarGroupLabel>
