@@ -207,20 +207,31 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
     );
   };
 
-  // Calculate total years when either number of rights or years per right changes
+  // Function to calculate total years
+  const calculateTotalYears = React.useCallback(() => {
+    const rights = form.getValues('rights_of_renewal');
+    if (rights.number_of_rights && rights.years_per_right) {
+      const total = Number(rights.number_of_rights) * Number(rights.years_per_right);
+      form.setValue('rights_of_renewal.total_years', String(total), {
+        shouldValidate: false,
+        shouldDirty: true,
+      });
+    }
+  }, [form]);
+
+  // Watch for changes in number_of_rights and years_per_right
   React.useEffect(() => {
     const subscription = form.watch((value, { name }) => {
-      if (name?.startsWith('rights_of_renewal.')) {
-        const rights = form.getValues('rights_of_renewal');
-        if (rights.number_of_rights && rights.years_per_right) {
-          const total = Number(rights.number_of_rights) * Number(rights.years_per_right);
-          form.setValue('rights_of_renewal.total_years', String(total));
-        }
+      if (
+        name === 'rights_of_renewal.number_of_rights' ||
+        name === 'rights_of_renewal.years_per_right'
+      ) {
+        calculateTotalYears();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [form]);
+  }, [form, calculateTotalYears]);
 
   return (
     <Form {...form}>
