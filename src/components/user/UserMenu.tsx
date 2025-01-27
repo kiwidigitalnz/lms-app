@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,21 +7,42 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { User, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
   
-  const initials = user?.email
-    ?.split("@")[0]
-    .slice(0, 2)
-    .toUpperCase() || "??";
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, avatar_url")
+        .eq("id", user?.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const initials = profile
+    ? `${profile.first_name?.[0] || ""}${profile.last_name?.[0] || ""}`
+    : user?.email?.slice(0, 2).toUpperCase() || "??";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="h-8 w-8 cursor-pointer">
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
+        <div className="cursor-pointer">
+          <ProfileAvatar
+            avatarUrl={profile?.avatar_url}
+            initials={initials}
+            size="sm"
+          />
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem asChild>
