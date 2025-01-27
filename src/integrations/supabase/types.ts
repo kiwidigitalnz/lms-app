@@ -130,42 +130,99 @@ export type Database = {
       }
       leases: {
         Row: {
+          business_unit: string | null
+          capitalised_improvements_rent: number | null
           created_at: string | null
+          current_annual_rental: number | null
+          current_cpi_percentage: number | null
+          division: string | null
           end_date: string
+          final_expiry_date: string | null
+          fixed_rent_review_percentage: number | null
+          future_rent_review_dates: string | null
+          general_notes: string | null
           id: string
+          lease_purpose: string | null
+          lease_renewal_notice_date: string | null
           lease_type: Database["public"]["Enums"]["lease_type"]
+          market_rent_review_cap: number | null
+          market_rent_review_collar: number | null
+          market_rent_review_estimate: number | null
+          next_rent_review_date: string | null
           payment_frequency: Database["public"]["Enums"]["payment_frequency"]
           property_name: string
           rent_amount: number
+          rent_review_notes: string | null
+          rent_review_type: string | null
+          rights_of_renewal: string | null
           security_deposit: number | null
           start_date: string
           tenant_id: string
+          title: string | null
           updated_at: string | null
         }
         Insert: {
+          business_unit?: string | null
+          capitalised_improvements_rent?: number | null
           created_at?: string | null
+          current_annual_rental?: number | null
+          current_cpi_percentage?: number | null
+          division?: string | null
           end_date: string
+          final_expiry_date?: string | null
+          fixed_rent_review_percentage?: number | null
+          future_rent_review_dates?: string | null
+          general_notes?: string | null
           id?: string
+          lease_purpose?: string | null
+          lease_renewal_notice_date?: string | null
           lease_type: Database["public"]["Enums"]["lease_type"]
+          market_rent_review_cap?: number | null
+          market_rent_review_collar?: number | null
+          market_rent_review_estimate?: number | null
+          next_rent_review_date?: string | null
           payment_frequency: Database["public"]["Enums"]["payment_frequency"]
           property_name: string
           rent_amount: number
+          rent_review_notes?: string | null
+          rent_review_type?: string | null
+          rights_of_renewal?: string | null
           security_deposit?: number | null
           start_date: string
           tenant_id: string
+          title?: string | null
           updated_at?: string | null
         }
         Update: {
+          business_unit?: string | null
+          capitalised_improvements_rent?: number | null
           created_at?: string | null
+          current_annual_rental?: number | null
+          current_cpi_percentage?: number | null
+          division?: string | null
           end_date?: string
+          final_expiry_date?: string | null
+          fixed_rent_review_percentage?: number | null
+          future_rent_review_dates?: string | null
+          general_notes?: string | null
           id?: string
+          lease_purpose?: string | null
+          lease_renewal_notice_date?: string | null
           lease_type?: Database["public"]["Enums"]["lease_type"]
+          market_rent_review_cap?: number | null
+          market_rent_review_collar?: number | null
+          market_rent_review_estimate?: number | null
+          next_rent_review_date?: string | null
           payment_frequency?: Database["public"]["Enums"]["payment_frequency"]
           property_name?: string
           rent_amount?: number
+          rent_review_notes?: string | null
+          rent_review_type?: string | null
+          rights_of_renewal?: string | null
           security_deposit?: number | null
           start_date?: string
           tenant_id?: string
+          title?: string | null
           updated_at?: string | null
         }
         Relationships: []
