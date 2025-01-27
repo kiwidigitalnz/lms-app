@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Shield, UserCog, User } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -30,6 +32,15 @@ export default function Auth() {
     }
   };
 
+  const handleQuickLogin = async (email: string, password: string) => {
+    try {
+      await signIn(email, password);
+      toast.success("Successfully signed in!");
+    } catch (error: any) {
+      toast.error("Error signing in: " + error.message);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -50,6 +61,37 @@ export default function Auth() {
         <h2 className="text-2xl font-bold text-center">
           {isLogin ? "Sign in to your account" : "Create a new account"}
         </h2>
+
+        {/* Quick Login Buttons */}
+        {isLogin && (
+          <div className="space-y-3">
+            <Button
+              variant="outline"
+              className="w-full bg-purple-50 hover:bg-purple-100 border-purple-200"
+              onClick={() => handleQuickLogin("super@test.com", "password123")}
+            >
+              <Shield className="mr-2 h-4 w-4 text-purple-500" />
+              Quick Login as Super User
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full bg-blue-50 hover:bg-blue-100 border-blue-200"
+              onClick={() => handleQuickLogin("admin@test.com", "password123")}
+            >
+              <UserCog className="mr-2 h-4 w-4 text-blue-500" />
+              Quick Login as Client Admin
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full bg-green-50 hover:bg-green-100 border-green-200"
+              onClick={() => handleQuickLogin("tenant@test.com", "password123")}
+            >
+              <User className="mr-2 h-4 w-4 text-green-500" />
+              Quick Login as Tenant
+            </Button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <>
