@@ -78,6 +78,7 @@ export function ContactSelect({
   };
 
   const handleSelect = (contactId: string) => {
+    setOpen(false); // Close popover after selection
     const newValue = value.includes(contactId)
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
