@@ -1,4 +1,4 @@
-import { Home, Building, FileText, Bell, Settings, LogOut, UserPlus } from "lucide-react";
+import { Home, Building, FileText, Bell, Settings, LogOut, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -14,13 +14,12 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ContactForm } from "@/components/contacts/ContactForm";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/" },
   { title: "Properties", icon: Building, url: "/properties" },
   { title: "Leases", icon: FileText, url: "/leases" },
+  { title: "Contacts", icon: Users, url: "/contacts" },
   { title: "Notifications", icon: Bell, url: "/notifications" },
   { title: "Settings", icon: Settings, url: "/settings" },
 ];
@@ -80,29 +79,6 @@ export function AppSidebar() {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
-                <SidebarMenuItem>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <SidebarMenuButton 
-                        tooltip={state === "collapsed" ? "New Contact" : undefined}
-                        className="w-full"
-                      >
-                        <UserPlus className="h-5 w-5 shrink-0" />
-                        <span className={state === "collapsed" ? "hidden" : ""}>New Contact</span>
-                      </SidebarMenuButton>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Contact</DialogTitle>
-                      </DialogHeader>
-                      <ContactForm onSuccess={() => {
-                        // Close dialog after successful submission
-                        const closeButton = document.querySelector('[data-dialog-close]') as HTMLButtonElement;
-                        if (closeButton) closeButton.click();
-                      }} />
-                    </DialogContent>
-                  </Dialog>
-                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
