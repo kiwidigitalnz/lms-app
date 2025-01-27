@@ -62,21 +62,22 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
       
       if (!user) throw new Error("No user found");
 
+      // Prepare the lease data to match the table schema
       const leaseData = {
-        ...data,
+        property_name: data.property_name,
+        lease_type: data.lease_type,
+        start_date: data.start_date,
+        end_date: data.end_date,
         rent_amount: parseFloat(data.rent_amount),
-        security_deposit: data.security_deposit
-          ? parseFloat(data.security_deposit)
-          : null,
+        payment_frequency: data.payment_frequency,
+        security_deposit: data.security_deposit ? parseFloat(data.security_deposit) : null,
+        tenant_id: user.id,
       };
 
       if (mode === "create") {
         const { error } = await supabase
           .from("leases")
-          .insert({
-            ...leaseData,
-            tenant_id: user.id,
-          });
+          .insert(leaseData);
 
         if (error) throw error;
 
