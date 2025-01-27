@@ -13,20 +13,6 @@ export function AdditionalInfoTab({ form }: AdditionalInfoTabProps) {
     <div className="space-y-4">
       <FormField
         control={form.control}
-        name="rent_review_type"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Rent Review Type</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
         name="rent_review_notes"
         render={({ field }) => (
           <FormItem>
