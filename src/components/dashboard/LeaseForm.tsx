@@ -12,6 +12,7 @@ import { BasicInfoTab } from "./lease-form/BasicInfoTab";
 import { DatesTab } from "./lease-form/DatesTab";
 import { FinancialTab } from "./lease-form/FinancialTab";
 import { AdditionalInfoTab } from "./lease-form/AdditionalInfoTab";
+import { DocumentsTab } from "./lease-form/DocumentsTab";
 
 const leaseSchema = z.object({
   title: z.string().optional(),
@@ -37,7 +38,7 @@ const leaseSchema = z.object({
   security_deposit: z.string().optional(),
   next_rent_review_date: z.string().optional(),
   future_rent_review_dates: z.array(z.string()).optional(),
-  rent_review_type: z.string().optional(),
+  rent_review_type: z.enum(["market", "cpi", "fixed"]).optional(),
   rent_review_notes: z.string().optional(),
   current_annual_rental: z.string().optional(),
   capitalised_improvements_rent: z.string().optional(),
@@ -186,11 +187,12 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="dates">Dates</TabsTrigger>
             <TabsTrigger value="financial">Financial</TabsTrigger>
             <TabsTrigger value="additional">Additional Info</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic">
@@ -207,6 +209,10 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
 
           <TabsContent value="additional">
             <AdditionalInfoTab form={form} />
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <DocumentsTab form={form} leaseId={initialData?.id} />
           </TabsContent>
         </Tabs>
 

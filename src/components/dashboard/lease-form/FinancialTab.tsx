@@ -2,12 +2,15 @@ import * as React from "react";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface FinancialTabProps {
   form: UseFormReturn<any>;
 }
 
 export function FinancialTab({ form }: FinancialTabProps) {
+  const rentReviewType = form.watch("rent_review_type");
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -31,18 +34,20 @@ export function FinancialTab({ form }: FinancialTabProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Payment Frequency</FormLabel>
-              <FormControl>
-                <select
-                  {...field}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="weekly">Weekly</option>
-                  <option value="fortnightly">Fortnightly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="annually">Annually</option>
-                </select>
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="fortnightly">Fortnightly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="quarterly">Quarterly</SelectItem>
+                  <SelectItem value="annually">Annually</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -81,39 +86,80 @@ export function FinancialTab({ form }: FinancialTabProps) {
 
       <FormField
         control={form.control}
-        name="capitalised_improvements_rent"
+        name="rent_review_type"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Capitalised Improvements Rent</FormLabel>
-            <FormControl>
-              <Input type="number" step="0.01" {...field} />
-            </FormControl>
+            <FormLabel>Rent Review Type</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select review type" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="market">Market Rent Review</SelectItem>
+                <SelectItem value="cpi">CPI Adjustment</SelectItem>
+                <SelectItem value="fixed">Fixed Percentage</SelectItem>
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <FormField
-          control={form.control}
-          name="fixed_rent_review_percentage"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Fixed Rent Review Percentage (%)</FormLabel>
-              <FormControl>
-                <Input type="number" step="0.01" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      {rentReviewType === "market" && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <FormField
+            control={form.control}
+            name="market_rent_review_estimate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Market Review Estimate (%)</FormLabel>
+                <FormControl>
+                  <Input type="number" step="0.01" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
+          <FormField
+            control={form.control}
+            name="market_rent_review_cap"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Market Review Cap (%)</FormLabel>
+                <FormControl>
+                  <Input type="number" step="0.01" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="market_rent_review_collar"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Market Review Collar (%)</FormLabel>
+                <FormControl>
+                  <Input type="number" step="0.01" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      )}
+
+      {rentReviewType === "cpi" && (
         <FormField
           control={form.control}
           name="current_cpi_percentage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Current CPI Percentage (%)</FormLabel>
+              <FormLabel>Current CPI Rate (%)</FormLabel>
               <FormControl>
                 <Input type="number" step="0.01" {...field} />
               </FormControl>
@@ -121,15 +167,15 @@ export function FinancialTab({ form }: FinancialTabProps) {
             </FormItem>
           )}
         />
-      </div>
+      )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {rentReviewType === "fixed" && (
         <FormField
           control={form.control}
-          name="market_rent_review_estimate"
+          name="fixed_rent_review_percentage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Market Review Estimate (%)</FormLabel>
+              <FormLabel>Fixed Review Percentage (%)</FormLabel>
               <FormControl>
                 <Input type="number" step="0.01" {...field} />
               </FormControl>
@@ -137,35 +183,7 @@ export function FinancialTab({ form }: FinancialTabProps) {
             </FormItem>
           )}
         />
-
-        <FormField
-          control={form.control}
-          name="market_rent_review_cap"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Market Review Cap (%)</FormLabel>
-              <FormControl>
-                <Input type="number" step="0.01" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="market_rent_review_collar"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Market Review Collar (%)</FormLabel>
-              <FormControl>
-                <Input type="number" step="0.01" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      )}
     </div>
   );
 }
