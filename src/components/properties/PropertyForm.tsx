@@ -2,21 +2,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BasicInfoTab } from "./form/BasicInfoTab";
+import { DetailsTab } from "./form/DetailsTab";
+import { ComplianceTab } from "./form/ComplianceTab";
 import { ImageUpload } from "./ImageUpload";
+import { Textarea } from "@/components/ui/textarea";
 
 const propertySchema = z.object({
   name: z.string().min(1, "Property name is required"),
@@ -25,18 +20,18 @@ const propertySchema = z.object({
   floor_area: z.string().optional(),
   year_built: z.string().optional(),
   description: z.string().optional(),
-  ownership_status: z.enum(["owned", "leased", "managed"]).optional(),
+  ownership_status: z.enum(["owned", "leased", "managed"]),
   insurance_status: z.string().optional(),
   insurance_expiry_date: z.string().optional(),
   seismic_rating: z.string().optional(),
-  asbestos_status: z.enum(["present", "not_present", "unknown"]).optional(),
-  contamination_status: z.enum(["yes", "no", "unknown"]).optional(),
+  asbestos_status: z.enum(["present", "not_present", "unknown"]),
+  contamination_status: z.enum(["yes", "no", "unknown"]),
   oio_sensitive: z.boolean().optional(),
   operational_consent_date: z.string().optional(),
   notes: z.string().optional(),
 });
 
-type PropertyFormValues = z.infer<typeof propertySchema>;
+export type PropertyFormValues = z.infer<typeof propertySchema>;
 
 interface PropertyFormProps {
   onSuccess?: () => void;
@@ -133,243 +128,26 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Property Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="property_type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Property Type</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="commercial">Commercial</option>
-                    <option value="industrial">Industrial</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ownership_status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ownership Status</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="owned">Owned</option>
-                    <option value="leased">Leased</option>
-                    <option value="managed">Managed</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="floor_area"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Floor Area (sq ft)</FormLabel>
-                <FormControl>
-                  <Input type="number" step="0.01" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="year_built"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Year Built</FormLabel>
-                <FormControl>
-                  <Input type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="insurance_status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Insurance Status</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="insurance_expiry_date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Insurance Expiry Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <FormField
-            control={form.control}
-            name="seismic_rating"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Seismic Rating</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="asbestos_status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Asbestos Status</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="present">Present</option>
-                    <option value="not_present">Not Present</option>
-                    <option value="unknown">Unknown</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="contamination_status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contamination Status</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                    <option value="unknown">Unknown</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="oio_sensitive"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel>OIO Sensitive</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="operational_consent_date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Operational Consent Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <Tabs defaultValue="basic" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="basic">Basic Info</TabsTrigger>
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="basic" className="space-y-4 mt-4">
+            <BasicInfoTab form={form} />
+          </TabsContent>
+          
+          <TabsContent value="details" className="space-y-4 mt-4">
+            <DetailsTab form={form} />
+          </TabsContent>
+          
+          <TabsContent value="compliance" className="space-y-4 mt-4">
+            <ComplianceTab form={form} />
+          </TabsContent>
+        </Tabs>
 
         <FormField
           control={form.control}
@@ -392,7 +170,7 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
           />
         )}
 
-        <Button type="submit">
+        <Button type="submit" className="w-full">
           {mode === "create" ? "Add Property" : "Update Property"}
         </Button>
       </form>
