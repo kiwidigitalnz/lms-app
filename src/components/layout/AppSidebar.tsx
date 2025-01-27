@@ -1,4 +1,4 @@
-import { Home, Building, FileText, Bell, Settings, LogOut, ChevronLeft } from "lucide-react";
+import { Home, Building, FileText, Bell, Settings, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,7 +27,7 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar>
+    <Sidebar className="fixed left-0 top-0 z-20 h-full">
       <SidebarContent>
         <div className="relative">
           <SidebarTrigger className="absolute right-2 top-2 z-50" />
