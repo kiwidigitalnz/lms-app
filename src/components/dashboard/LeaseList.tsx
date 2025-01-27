@@ -11,8 +11,9 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { FileText, Plus, Pencil, Trash2 } from "lucide-react";
+import { FileText, Plus, Pencil, Trash2, TrendingUp } from "lucide-react";
 import { LeaseForm } from "./LeaseForm";
+import { RentReviewForm } from "./RentReviewForm";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 export function LeaseList() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingLease, setEditingLease] = useState<any>(null);
+  const [reviewingLease, setReviewingLease] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -111,7 +113,7 @@ export function LeaseList() {
                     /{lease.payment_frequency}
                   </span>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right space-x-2">
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button
@@ -133,6 +135,29 @@ export function LeaseList() {
                       />
                     </DialogContent>
                   </Dialog>
+                  
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setReviewingLease(lease)}
+                      >
+                        <TrendingUp className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Add Rent Review</DialogTitle>
+                      </DialogHeader>
+                      <RentReviewForm
+                        leaseId={lease.id}
+                        currentRent={lease.rent_amount}
+                        onSuccess={() => setReviewingLease(null)}
+                      />
+                    </DialogContent>
+                  </Dialog>
+
                   <Button
                     variant="ghost"
                     size="icon"

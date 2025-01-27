@@ -35,7 +35,7 @@ type LeaseFormValues = z.infer<typeof leaseSchema>;
 
 interface LeaseFormProps {
   onSuccess?: () => void;
-  initialData?: LeaseFormValues;
+  initialData?: any;
   mode?: "create" | "edit";
 }
 
@@ -58,9 +58,14 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
 
   const onSubmit = async (data: LeaseFormValues) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) throw new Error("No user found");
+
       if (mode === "create") {
         const { error } = await supabase.from("leases").insert({
           ...data,
+          tenant_id: user.id,
           rent_amount: parseFloat(data.rent_amount),
           security_deposit: data.security_deposit
             ? parseFloat(data.security_deposit)
@@ -83,7 +88,7 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
               ? parseFloat(data.security_deposit)
               : null,
           })
-          .eq("id", initialData?.id);
+          .eq("id", initialData.id);
 
         if (error) throw error;
 
