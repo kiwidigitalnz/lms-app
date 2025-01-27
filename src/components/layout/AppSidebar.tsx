@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/" },
@@ -61,7 +60,6 @@ export function AppSidebar() {
           <LogOut className="h-4 w-4" />
           <span>Sign Out</span>
         </SidebarMenuButton>
-        <SidebarTrigger className="w-full" />
       </SidebarFooter>
     </Sidebar>
   );
