@@ -15,6 +15,16 @@ interface ContactsTabProps {
 export function ContactsTab({ form }: ContactsTabProps) {
   console.log("ContactsTab rendered with form values:", form.getValues());
 
+  const handleContactChange = (fieldName: string, value: string[]) => {
+    console.log(`${fieldName} changing to:`, value);
+    form.setValue(fieldName, value, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true
+    });
+    console.log(`Form values after ${fieldName} update:`, form.getValues());
+  };
+
   return (
     <div className="space-y-4">
       <FormField
@@ -29,8 +39,7 @@ export function ContactsTab({ form }: ContactsTabProps) {
                 value={field.value || []}
                 onChange={(value) => {
                   console.log("Landlord contacts onChange called with:", value);
-                  field.onChange(value);
-                  console.log("Form values after landlord update:", form.getValues());
+                  handleContactChange("landlord_contact_ids", value);
                 }}
                 contactType="landlord"
                 placeholder="Select landlord..."
@@ -53,8 +62,7 @@ export function ContactsTab({ form }: ContactsTabProps) {
                 value={field.value || []}
                 onChange={(value) => {
                   console.log("Property manager contacts onChange called with:", value);
-                  field.onChange(value);
-                  console.log("Form values after property manager update:", form.getValues());
+                  handleContactChange("property_manager_contact_ids", value);
                 }}
                 contactType="property_manager"
                 placeholder="Select property manager..."
@@ -77,8 +85,7 @@ export function ContactsTab({ form }: ContactsTabProps) {
                 value={field.value || []}
                 onChange={(value) => {
                   console.log("Site contacts onChange called with:", value);
-                  field.onChange(value);
-                  console.log("Form values after site contact update:", form.getValues());
+                  handleContactChange("site_contact_ids", value);
                 }}
                 placeholder="Select site contact..."
               />
