@@ -51,7 +51,7 @@ export function LeaseList() {
 
       toast({
         title: "Success",
-        description: "Lease deleted successfully",
+        description: "Rental agreement deleted successfully",
       });
 
       queryClient.invalidateQueries({ queryKey: ["leases"] });
@@ -59,14 +59,14 @@ export function LeaseList() {
       console.error("Error deleting lease:", error);
       toast({
         title: "Error",
-        description: "Failed to delete lease",
+        description: "Failed to delete rental agreement",
         variant: "destructive",
       });
     }
   };
 
   if (isLoading) {
-    return <div>Loading leases...</div>;
+    return <div>Loading rental agreements...</div>;
   }
 
   return (
@@ -76,12 +76,12 @@ export function LeaseList() {
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2" />
-              Add Lease
+              Add Rental Agreement
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create New Lease</DialogTitle>
+              <DialogTitle>Add New Rental Agreement</DialogTitle>
             </DialogHeader>
             <LeaseForm onSuccess={() => setIsCreateOpen(false)} />
           </DialogContent>
@@ -126,7 +126,7 @@ export function LeaseList() {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>Edit Lease</DialogTitle>
+                        <DialogTitle>Edit Rental Agreement</DialogTitle>
                       </DialogHeader>
                       <LeaseForm
                         mode="edit"
@@ -148,7 +148,7 @@ export function LeaseList() {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>Add Rent Review</DialogTitle>
+                        <DialogTitle>Record Rent Review</DialogTitle>
                       </DialogHeader>
                       <RentReviewForm
                         leaseId={lease.id}
@@ -173,7 +173,7 @@ export function LeaseList() {
                 <TableCell colSpan={6} className="text-center py-8">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <FileText className="h-8 w-8" />
-                    <p>No leases found</p>
+                    <p>No rental agreements found</p>
                   </div>
                 </TableCell>
               </TableRow>

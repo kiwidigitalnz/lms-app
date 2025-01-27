@@ -62,39 +62,39 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
       
       if (!user) throw new Error("No user found");
 
+      const leaseData = {
+        ...data,
+        rent_amount: parseFloat(data.rent_amount),
+        security_deposit: data.security_deposit
+          ? parseFloat(data.security_deposit)
+          : null,
+      };
+
       if (mode === "create") {
-        const { error } = await supabase.from("leases").insert({
-          ...data,
-          tenant_id: user.id,
-          rent_amount: parseFloat(data.rent_amount),
-          security_deposit: data.security_deposit
-            ? parseFloat(data.security_deposit)
-            : null,
-        });
+        const { error } = await supabase
+          .from("leases")
+          .insert({
+            ...leaseData,
+            tenant_id: user.id,
+          });
 
         if (error) throw error;
 
         toast({
           title: "Success",
-          description: "Lease created successfully",
+          description: "Rental agreement saved successfully",
         });
       } else {
         const { error } = await supabase
           .from("leases")
-          .update({
-            ...data,
-            rent_amount: parseFloat(data.rent_amount),
-            security_deposit: data.security_deposit
-              ? parseFloat(data.security_deposit)
-              : null,
-          })
+          .update(leaseData)
           .eq("id", initialData.id);
 
         if (error) throw error;
 
         toast({
           title: "Success",
-          description: "Lease updated successfully",
+          description: "Rental agreement updated successfully",
         });
       }
 
@@ -104,7 +104,7 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
       console.error("Error saving lease:", error);
       toast({
         title: "Error",
-        description: "Failed to save lease",
+        description: "Failed to save rental agreement",
         variant: "destructive",
       });
     }
@@ -118,7 +118,7 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
           name="property_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Property Name</FormLabel>
+              <FormLabel>Property Name/Address</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -132,7 +132,7 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
           name="lease_type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Lease Type</FormLabel>
+              <FormLabel>Property Type</FormLabel>
               <FormControl>
                 <select
                   {...field}
@@ -232,7 +232,7 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
         />
 
         <Button type="submit">
-          {mode === "create" ? "Create Lease" : "Update Lease"}
+          {mode === "create" ? "Add Rental Agreement" : "Update Rental Agreement"}
         </Button>
       </form>
     </Form>
