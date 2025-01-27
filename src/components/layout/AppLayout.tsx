@@ -11,22 +11,24 @@ interface AppLayoutProps {
 export function AppLayout({ children, title, description }: AppLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      <div className="min-h-screen flex">
         <AppSidebar />
-        <main className="flex-1 p-8 md:ml-[3.5rem] transition-[margin] duration-300 group-data-[state=expanded]:md:ml-64">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold">{title}</h1>
-              {description && (
-                <p className="text-muted-foreground">{description}</p>
-              )}
+        <div className="flex-1 transition-all duration-300 md:ml-[3.5rem] group-data-[state=expanded]:md:ml-64">
+          <main className="p-8">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h1 className="text-3xl font-bold">{title}</h1>
+                {description && (
+                  <p className="text-muted-foreground">{description}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <NotificationList />
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <NotificationList />
-            </div>
-          </div>
-          {children}
-        </main>
+            {children}
+          </main>
+        </div>
       </div>
     </SidebarProvider>
   );
