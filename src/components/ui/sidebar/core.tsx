@@ -5,10 +5,11 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { SidebarContext, useSidebar } from "./context"
+import { SidebarContext, useSidebar, SidebarState } from "./context"
 
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
+const SIDEBAR_WIDTH_MOBILE = "18rem"
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
