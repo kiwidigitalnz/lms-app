@@ -48,7 +48,7 @@ export function ContactSelect({
   contactType,
   placeholder = "Select contact..."
 }: ContactSelectProps) {
-  console.log("ContactSelect rendered with value:", value);
+  console.log("ContactSelect rendered with props:", { value, contactType, placeholder });
   
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -67,7 +67,10 @@ export function ContactSelect({
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching contacts:", error);
+        throw error;
+      }
       console.log("Fetched contacts:", data);
       return (data || []) as Contact[];
     },
@@ -92,6 +95,7 @@ export function ContactSelect({
     
     console.log("New value to be set:", newValue);
     onChange(newValue);
+    console.log("onChange called with newValue");
     setOpen(false);
   };
 

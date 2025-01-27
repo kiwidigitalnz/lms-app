@@ -71,6 +71,8 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  console.log("PropertyForm initialData:", initialData);
+
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
     defaultValues: initialData || {
@@ -110,7 +112,10 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
     },
   });
 
+  console.log("Form current values:", form.getValues());
+
   const onSubmit = async (data: PropertyFormValues) => {
+    console.log("Form submitted with data:", data);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -126,6 +131,8 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
         site_area: data.site_area ? parseFloat(data.site_area) : null,
         year_built: data.year_built ? parseInt(data.year_built) : null,
       };
+
+      console.log("Saving property data:", propertyData);
 
       let propertyId: string;
 
