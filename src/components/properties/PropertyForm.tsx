@@ -17,7 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BasicInfoTab } from "./form/BasicInfoTab";
 import { DetailsTab } from "./form/DetailsTab";
 import { ComplianceTab } from "./form/ComplianceTab";
-import { InsuranceTab } from "./form/InsuranceTab";
 import { EnvironmentalTab } from "./form/EnvironmentalTab";
 import { TechnicalTab } from "./form/TechnicalTab";
 import { ImageUpload } from "./ImageUpload";
@@ -140,6 +139,7 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
         ...data,
         tenant_id: user.id,
         floor_area: data.floor_area ? parseFloat(data.floor_area) : null,
+        site_area: data.site_area ? parseFloat(data.site_area) : null,
         year_built: data.year_built ? parseInt(data.year_built) : null,
       };
 
@@ -184,11 +184,10 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
-            <TabsTrigger value="insurance">Insurance</TabsTrigger>
             <TabsTrigger value="environmental">Environmental</TabsTrigger>
             <TabsTrigger value="technical">Technical</TabsTrigger>
             <TabsTrigger value="contacts">Contacts</TabsTrigger>
@@ -204,10 +203,6 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
           
           <TabsContent value="compliance" className="space-y-4 mt-4">
             <ComplianceTab form={form} />
-          </TabsContent>
-
-          <TabsContent value="insurance" className="space-y-4 mt-4">
-            <InsuranceTab form={form} />
           </TabsContent>
 
           <TabsContent value="environmental" className="space-y-4 mt-4">
