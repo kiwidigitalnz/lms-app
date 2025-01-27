@@ -321,7 +321,6 @@ export type Database = {
           insurance_notes: string | null
           insurance_policy_number: string | null
           insurance_provider: string | null
-          landlord_contact_id: string | null
           last_building_wof_date: string | null
           nabersnz_rating: string | null
           name: string
@@ -333,11 +332,9 @@ export type Database = {
           oio_sensitive: boolean | null
           operational_consent_date: string | null
           ownership_status: string | null
-          property_manager_contact_id: string | null
           property_type: Database["public"]["Enums"]["property_type"]
           seismic_rating: string | null
           site_area: number | null
-          site_contact_id: string | null
           tenant_id: string
           updated_at: string | null
           waste_management_plan: boolean | null
@@ -364,7 +361,6 @@ export type Database = {
           insurance_notes?: string | null
           insurance_policy_number?: string | null
           insurance_provider?: string | null
-          landlord_contact_id?: string | null
           last_building_wof_date?: string | null
           nabersnz_rating?: string | null
           name: string
@@ -376,11 +372,9 @@ export type Database = {
           oio_sensitive?: boolean | null
           operational_consent_date?: string | null
           ownership_status?: string | null
-          property_manager_contact_id?: string | null
           property_type: Database["public"]["Enums"]["property_type"]
           seismic_rating?: string | null
           site_area?: number | null
-          site_contact_id?: string | null
           tenant_id: string
           updated_at?: string | null
           waste_management_plan?: boolean | null
@@ -407,7 +401,6 @@ export type Database = {
           insurance_notes?: string | null
           insurance_policy_number?: string | null
           insurance_provider?: string | null
-          landlord_contact_id?: string | null
           last_building_wof_date?: string | null
           nabersnz_rating?: string | null
           name?: string
@@ -419,39 +412,15 @@ export type Database = {
           oio_sensitive?: boolean | null
           operational_consent_date?: string | null
           ownership_status?: string | null
-          property_manager_contact_id?: string | null
           property_type?: Database["public"]["Enums"]["property_type"]
           seismic_rating?: string | null
           site_area?: number | null
-          site_contact_id?: string | null
           tenant_id?: string
           updated_at?: string | null
           waste_management_plan?: boolean | null
           year_built?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "properties_landlord_contact_id_fkey"
-            columns: ["landlord_contact_id"]
-            isOneToOne: false
-            referencedRelation: "contacts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "properties_property_manager_contact_id_fkey"
-            columns: ["property_manager_contact_id"]
-            isOneToOne: false
-            referencedRelation: "contacts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "properties_site_contact_id_fkey"
-            columns: ["site_contact_id"]
-            isOneToOne: false
-            referencedRelation: "contacts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       property_compliance: {
         Row: {
