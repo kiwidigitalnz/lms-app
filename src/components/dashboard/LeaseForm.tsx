@@ -16,7 +16,7 @@ import { AdditionalInfoTab } from "./lease-form/AdditionalInfoTab";
 const leaseSchema = z.object({
   title: z.string().optional(),
   property_name: z.string().min(1, "Property name is required"),
-  lease_type: z.string().min(1, "Lease type is required"),
+  lease_type: z.enum(["commercial", "residential", "industrial"]),
   start_date: z.string().min(1, "Start date is required"),
   end_date: z.string().min(1, "End date is required"),
   final_expiry_date: z.string().optional(),
@@ -80,7 +80,7 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
     } : {
       title: "",
       property_name: "",
-      lease_type: "",
+      lease_type: "commercial",
       start_date: "",
       end_date: "",
       final_expiry_date: "",
