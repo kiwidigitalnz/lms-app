@@ -1,6 +1,6 @@
 import * as React from "react"
 
-type SidebarState = "expanded" | "collapsed"
+export type SidebarState = "expanded" | "collapsed"
 
 type SidebarContext = {
   state: SidebarState
