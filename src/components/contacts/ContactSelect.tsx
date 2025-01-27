@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ChevronsUpDown, Plus, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { ContactForm } from "./ContactForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,14 +36,14 @@ interface Contact {
 }
 
 interface ContactSelectProps {
-  value?: string;
-  onChange: (value: string) => void;
+  value?: string[];
+  onChange: (value: string[]) => void;
   contactType?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
   placeholder?: string;
 }
 
 export function ContactSelect({ 
-  value, 
+  value = [], 
   onChange, 
   contactType,
   placeholder = "Select contact..."
@@ -69,11 +70,22 @@ export function ContactSelect({
   });
 
   const contacts = data || [];
-  const selectedContact = contacts.find((contact) => contact.id === value);
+  const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
     return contact.company ? `${name} (${contact.company})` : name;
+  };
+
+  const handleSelect = (contactId: string) => {
+    const newValue = value.includes(contactId)
+      ? value.filter(id => id !== contactId)
+      : [...value, contactId];
+    onChange(newValue);
+  };
+
+  const removeContact = (contactId: string) => {
+    onChange(value.filter(id => id !== contactId));
   };
 
   const renderCommandContent = () => {
@@ -106,15 +118,12 @@ export function ContactSelect({
           <CommandItem
             key={contact.id}
             value={contact.id}
-            onSelect={(currentValue) => {
-              onChange(currentValue);
-              setOpen(false);
-            }}
+            onSelect={() => handleSelect(contact.id)}
           >
             <Check
               className={cn(
                 "mr-2 h-4 w-4",
-                value === contact.id ? "opacity-100" : "opacity-0"
+                value.includes(contact.id) ? "opacity-100" : "opacity-0"
               )}
             />
             {getContactLabel(contact)}
@@ -125,7 +134,7 @@ export function ContactSelect({
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col gap-2">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -140,8 +149,10 @@ export function ContactSelect({
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Loading...
               </div>
-            ) : value && selectedContact ? (
-              getContactLabel(selectedContact)
+            ) : selectedContacts.length > 0 ? (
+              <span className="truncate">
+                {`${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'} selected`}
+              </span>
             ) : (
               placeholder
             )}
@@ -158,9 +169,26 @@ export function ContactSelect({
         </PopoverContent>
       </Popover>
 
+      {selectedContacts.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selectedContacts.map((contact) => (
+            <Badge key={contact.id} variant="secondary">
+              {getContactLabel(contact)}
+              <button
+                className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                onClick={() => removeContact(contact.id)}
+              >
+                <X className="h-3 w-3" />
+                <span className="sr-only">Remove</span>
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="shrink-0">
             <Plus className="h-4 w-4" />
           </Button>
         </DialogTrigger>
