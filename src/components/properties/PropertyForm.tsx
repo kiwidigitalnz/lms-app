@@ -58,10 +58,11 @@ const propertySchema = z.object({
   elevator_count: z.number().optional(),
   last_building_wof_date: z.string().optional(),
   next_building_wof_date: z.string().optional(),
-  insurance_provider: z.string().optional(),
+  insurance_provider_contact_ids: z.array(z.string()).optional(),
   insurance_policy_number: z.string().optional(),
   insurance_coverage_amount: z.number().optional(),
-  insurance_notes: z.string().optional(),
+  insurance_start_date: z.string().optional(),
+  insurance_renewal_date: z.string().optional(),
 });
 
 export type PropertyFormValues = z.infer<typeof propertySchema>;
@@ -75,8 +76,6 @@ interface PropertyFormProps {
 export function PropertyForm({ onSuccess, initialData, mode = "create" }: PropertyFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  console.log("PropertyForm initialData:", initialData);
 
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
@@ -114,17 +113,15 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       elevator_count: undefined,
       last_building_wof_date: "",
       next_building_wof_date: "",
-      insurance_provider: "",
+      insurance_provider_contact_ids: [],
       insurance_policy_number: "",
       insurance_coverage_amount: undefined,
-      insurance_notes: "",
+      insurance_start_date: "",
+      insurance_renewal_date: "",
     },
   });
 
-  console.log("Form current values:", form.getValues());
-
   const onSubmit = async (data: PropertyFormValues) => {
-    console.log("Form submitted with data:", data);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -140,8 +137,6 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
         site_area: data.site_area ? parseFloat(data.site_area) : null,
         year_built: data.year_built ? parseInt(data.year_built) : null,
       };
-
-      console.log("Saving property data:", propertyData);
 
       let propertyId: string;
 
@@ -198,14 +193,12 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
   };
 
   const handlePropertyContacts = async (propertyId: string, contactIds: string[], role: string) => {
-    // First, remove existing contacts for this role
     await supabase
       .from("property_contacts")
       .delete()
       .eq("property_id", propertyId)
       .eq("role", role);
 
-    // Then, add new contacts
     const contactsToInsert = contactIds.map(contactId => ({
       property_id: propertyId,
       contact_id: contactId,
