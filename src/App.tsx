@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Properties from "./pages/Properties";
+import Leases from "./pages/Leases";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +26,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Index />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/properties"
+              element={
+                <ProtectedRoute>
+                  <Properties />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/leases"
+              element={
+                <ProtectedRoute>
+                  <Leases />
                 </ProtectedRoute>
               }
             />

@@ -1,13 +1,11 @@
-import { Building, DollarSign, FileText, Users } from "lucide-react";
+import { Building, DollarSign, FileText, Users, Calendar, ListTodo, Clock } from "lucide-react";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { LeaseList } from "@/components/dashboard/LeaseList";
-import { PropertyList } from "@/components/properties/PropertyList";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { NotificationList } from "@/components/notifications/NotificationList";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Index = () => {
   const { data: stats } = useQuery({
@@ -56,9 +54,9 @@ const Index = () => {
         <main className="flex-1 p-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold">Commercial Lease Management</h1>
+              <h1 className="text-3xl font-bold">Dashboard</h1>
               <p className="text-muted-foreground">
-                Manage your commercial and industrial properties and leases
+                Welcome to your property management dashboard
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -90,32 +88,43 @@ const Index = () => {
             />
           </div>
 
-          <Tabs defaultValue="properties" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="properties">Properties</TabsTrigger>
-              <TabsTrigger value="leases">Lease Agreements</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="properties" className="space-y-4">
-              <div>
-                <h2 className="text-2xl font-bold">Your Properties</h2>
-                <p className="text-muted-foreground">
-                  Manage your commercial and industrial properties
-                </p>
-              </div>
-              <PropertyList />
-            </TabsContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Upcoming Events
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">No upcoming events</p>
+              </CardContent>
+            </Card>
 
-            <TabsContent value="leases" className="space-y-4">
-              <div>
-                <h2 className="text-2xl font-bold">Your Lease Agreements</h2>
-                <p className="text-muted-foreground">
-                  Track and manage your commercial and industrial property leases
-                </p>
-              </div>
-              <LeaseList />
-            </TabsContent>
-          </Tabs>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ListTodo className="h-4 w-4" />
+                  Tasks
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">No pending tasks</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Recent Updates
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">No recent updates</p>
+              </CardContent>
+            </Card>
+          </div>
         </main>
       </div>
     </SidebarProvider>
