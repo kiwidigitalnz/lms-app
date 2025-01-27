@@ -3,27 +3,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus } from "lucide-react";
+import { BasicInfoTab } from "./lease-form/BasicInfoTab";
+import { DatesTab } from "./lease-form/DatesTab";
+import { FinancialTab } from "./lease-form/FinancialTab";
+import { AdditionalInfoTab } from "./lease-form/AdditionalInfoTab";
 
 const leaseSchema = z.object({
   title: z.string().optional(),
   property_name: z.string().min(1, "Property name is required"),
-  lease_type: z.enum(["commercial", "residential", "industrial"]),
-  lease_purpose: z.string().optional(),
+  lease_type: z.string().min(1, "Lease type is required"),
   start_date: z.string().min(1, "Start date is required"),
   end_date: z.string().min(1, "End date is required"),
   final_expiry_date: z.string().optional(),
@@ -70,12 +63,10 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Parse initial rights of renewal data if it exists
   const initialRightsOfRenewal = initialData?.rights_of_renewal ? 
     JSON.parse(initialData.rights_of_renewal) : 
     { number_of_rights: '', years_per_right: '', total_years: '' };
 
-  // Parse initial future rent review dates if they exist
   const initialReviewDates = initialData?.future_rent_review_dates ? 
     JSON.parse(initialData.future_rent_review_dates) : 
     [];
@@ -89,8 +80,7 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
     } : {
       title: "",
       property_name: "",
-      lease_type: "commercial",
-      lease_purpose: "",
+      lease_type: "",
       start_date: "",
       end_date: "",
       final_expiry_date: "",
@@ -130,7 +120,6 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
         title: data.title,
         property_name: data.property_name,
         lease_type: data.lease_type,
-        lease_purpose: data.lease_purpose,
         start_date: data.start_date,
         end_date: data.end_date,
         final_expiry_date: data.final_expiry_date || null,
@@ -193,46 +182,6 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
     }
   };
 
-  // Function to add a new review date
-  const addReviewDate = () => {
-    const currentDates = form.getValues('future_rent_review_dates') || [];
-    form.setValue('future_rent_review_dates', [...currentDates, '']);
-  };
-
-  // Function to remove a review date
-  const removeReviewDate = (index: number) => {
-    const currentDates = form.getValues('future_rent_review_dates') || [];
-    form.setValue('future_rent_review_dates', 
-      currentDates.filter((_, i) => i !== index)
-    );
-  };
-
-  // Function to calculate total years
-  const calculateTotalYears = React.useCallback(() => {
-    const rights = form.getValues('rights_of_renewal');
-    if (rights.number_of_rights && rights.years_per_right) {
-      const total = Number(rights.number_of_rights) * Number(rights.years_per_right);
-      form.setValue('rights_of_renewal.total_years', String(total), {
-        shouldValidate: false,
-        shouldDirty: true,
-      });
-    }
-  }, [form]);
-
-  // Watch for changes in number_of_rights and years_per_right
-  React.useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (
-        name === 'rights_of_renewal.number_of_rights' ||
-        name === 'rights_of_renewal.years_per_right'
-      ) {
-        calculateTotalYears();
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form, calculateTotalYears]);
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -244,450 +193,20 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
             <TabsTrigger value="additional">Additional Info</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic" className="space-y-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Lease Title</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="property_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Property Name/Address</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="lease_type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Property Type</FormLabel>
-                  <FormControl>
-                    <select
-                      {...field}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="residential">Residential</option>
-                      <option value="commercial">Commercial</option>
-                      <option value="industrial">Industrial</option>
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="lease_purpose"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Lease Purpose</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <TabsContent value="basic">
+            <BasicInfoTab form={form} />
           </TabsContent>
 
-          <TabsContent value="dates" className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="start_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Start Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="end_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>End Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="final_expiry_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Final Expiry Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="lease_renewal_notice_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Lease Renewal Notice Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <FormField
-                  control={form.control}
-                  name="rights_of_renewal.number_of_rights"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Number of Rights</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="rights_of_renewal.years_per_right"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Years per Right</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="rights_of_renewal.total_years"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Total Years</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <FormLabel>Future Rent Review Dates</FormLabel>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addReviewDate}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Date
-                </Button>
-              </div>
-              
-              {form.watch('future_rent_review_dates')?.map((_, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`future_rent_review_dates.${index}`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeReviewDate(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
+          <TabsContent value="dates">
+            <DatesTab form={form} />
           </TabsContent>
 
-          <TabsContent value="financial" className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="rent_amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rent Amount</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="payment_frequency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Payment Frequency</FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <option value="weekly">Weekly</option>
-                        <option value="fortnightly">Fortnightly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="quarterly">Quarterly</option>
-                        <option value="annually">Annually</option>
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="security_deposit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Security Deposit</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="current_annual_rental"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Annual Rental</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="capitalised_improvements_rent"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Capitalised Improvements Rent</FormLabel>
-                  <FormControl>
-                    <Input type="number" step="0.01" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="fixed_rent_review_percentage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fixed Rent Review Percentage (%)</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="current_cpi_percentage"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current CPI Percentage (%)</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <FormField
-                control={form.control}
-                name="market_rent_review_estimate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Market Review Estimate (%)</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="market_rent_review_cap"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Market Review Cap (%)</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="market_rent_review_collar"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Market Review Collar (%)</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+          <TabsContent value="financial">
+            <FinancialTab form={form} />
           </TabsContent>
 
-          <TabsContent value="additional" className="space-y-4">
-            <FormField
-              control={form.control}
-              name="rent_review_type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Rent Review Type</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="rent_review_notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Rent Review Notes</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="division"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Division</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="business_unit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Unit</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="general_notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>General Notes</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <TabsContent value="additional">
+            <AdditionalInfoTab form={form} />
           </TabsContent>
         </Tabs>
 
