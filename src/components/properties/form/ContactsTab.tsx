@@ -13,17 +13,6 @@ interface ContactsTabProps {
 }
 
 export function ContactsTab({ form }: ContactsTabProps) {
-  const handleContactChange = (
-    fieldName: keyof Pick<PropertyFormValues, 'landlord_contact_ids' | 'property_manager_contact_ids' | 'site_contact_ids'>, 
-    value: string[]
-  ) => {
-    form.setValue(fieldName, value, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true
-    });
-  };
-
   return (
     <div className="space-y-4">
       <FormField
@@ -34,7 +23,7 @@ export function ContactsTab({ form }: ContactsTabProps) {
             <FormLabel>Landlords</FormLabel>
             <ContactSelect
               value={field.value || []}
-              onChange={(value) => handleContactChange("landlord_contact_ids", value)}
+              onChange={field.onChange}
               contactType="landlord"
               placeholder="Select landlord..."
             />
@@ -51,7 +40,7 @@ export function ContactsTab({ form }: ContactsTabProps) {
             <FormLabel>Property Managers</FormLabel>
             <ContactSelect
               value={field.value || []}
-              onChange={(value) => handleContactChange("property_manager_contact_ids", value)}
+              onChange={field.onChange}
               contactType="property_manager"
               placeholder="Select property manager..."
             />
@@ -68,7 +57,7 @@ export function ContactsTab({ form }: ContactsTabProps) {
             <FormLabel>Site Contacts</FormLabel>
             <ContactSelect
               value={field.value || []}
-              onChange={(value) => handleContactChange("site_contact_ids", value)}
+              onChange={field.onChange}
               placeholder="Select site contact..."
             />
             <FormMessage />

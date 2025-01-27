@@ -48,15 +48,12 @@ export function ContactSelect({
   contactType,
   placeholder = "Select contact..."
 }: ContactSelectProps) {
-  console.log("ContactSelect rendered with props:", { value, contactType, placeholder });
-  
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
-      console.log("Fetching contacts for type:", contactType);
       let query = supabase
         .from("contacts")
         .select("id, first_name, last_name, company, contact_type")
@@ -67,18 +64,13 @@ export function ContactSelect({
       }
 
       const { data, error } = await query;
-      if (error) {
-        console.error("Error fetching contacts:", error);
-        throw error;
-      }
-      console.log("Fetched contacts:", data);
+      if (error) throw error;
       return (data || []) as Contact[];
     },
   });
 
   const contacts = data || [];
   const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
-  console.log("Selected contacts:", selectedContacts);
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
@@ -86,67 +78,15 @@ export function ContactSelect({
   };
 
   const handleSelect = (contactId: string) => {
-    console.log("handleSelect called with contactId:", contactId);
-    console.log("Current value:", value);
-    
     const newValue = value.includes(contactId)
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
-    
-    console.log("New value to be set:", newValue);
     onChange(newValue);
-    console.log("onChange called with newValue");
     setOpen(false);
   };
 
   const removeContact = (contactId: string) => {
-    console.log("removeContact called with contactId:", contactId);
     onChange(value.filter(id => id !== contactId));
-  };
-
-  const renderCommandContent = () => {
-    if (isLoading) {
-      return (
-        <div className="py-6 text-center text-sm">
-          <Loader2 className="mx-auto h-4 w-4 animate-spin" />
-          <p className="mt-2">Loading contacts...</p>
-        </div>
-      );
-    }
-
-    if (!contacts || contacts.length === 0) {
-      return (
-        <CommandEmpty className="py-6 text-center text-sm">
-          No contacts found.
-          <div className="mt-2">
-            <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Contact
-            </Button>
-          </div>
-        </CommandEmpty>
-      );
-    }
-
-    return (
-      <CommandGroup>
-        {contacts.map((contact) => (
-          <CommandItem
-            key={contact.id}
-            value={contact.id}
-            onSelect={() => handleSelect(contact.id)}
-          >
-            <Check
-              className={cn(
-                "mr-2 h-4 w-4",
-                value.includes(contact.id) ? "opacity-100" : "opacity-0"
-              )}
-            />
-            {getContactLabel(contact)}
-          </CommandItem>
-        ))}
-      </CommandGroup>
-    );
   };
 
   return (
@@ -180,7 +120,40 @@ export function ContactSelect({
             <Command>
               <CommandInput placeholder="Search contacts..." />
               <CommandList>
-                {renderCommandContent()}
+                {isLoading ? (
+                  <div className="py-6 text-center text-sm">
+                    <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                    <p className="mt-2">Loading contacts...</p>
+                  </div>
+                ) : contacts.length === 0 ? (
+                  <CommandEmpty className="py-6 text-center text-sm">
+                    No contacts found.
+                    <div className="mt-2">
+                      <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create New Contact
+                      </Button>
+                    </div>
+                  </CommandEmpty>
+                ) : (
+                  <CommandGroup>
+                    {contacts.map((contact) => (
+                      <CommandItem
+                        key={contact.id}
+                        value={contact.id}
+                        onSelect={() => handleSelect(contact.id)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            value.includes(contact.id) ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {getContactLabel(contact)}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
               </CommandList>
             </Command>
           </PopoverContent>
