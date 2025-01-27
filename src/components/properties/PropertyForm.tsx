@@ -22,6 +22,7 @@ import { TechnicalTab } from "./form/TechnicalTab";
 import { ContactsTab } from "./form/ContactsTab";
 import { ImageUpload } from "./ImageUpload";
 import { Textarea } from "@/components/ui/textarea";
+import { InsuranceTab } from "./form/InsuranceTab";
 
 const propertySchema = z.object({
   name: z.string().min(1, "Property name is required"),
@@ -57,6 +58,10 @@ const propertySchema = z.object({
   elevator_count: z.number().optional(),
   last_building_wof_date: z.string().optional(),
   next_building_wof_date: z.string().optional(),
+  insurance_provider: z.string().optional(),
+  insurance_policy_number: z.string().optional(),
+  insurance_coverage_amount: z.number().optional(),
+  insurance_notes: z.string().optional(),
 });
 
 export type PropertyFormValues = z.infer<typeof propertySchema>;
@@ -109,6 +114,10 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       elevator_count: undefined,
       last_building_wof_date: "",
       next_building_wof_date: "",
+      insurance_provider: "",
+      insurance_policy_number: "",
+      insurance_coverage_amount: undefined,
+      insurance_notes: "",
     },
   });
 
@@ -216,12 +225,13 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
             <TabsTrigger value="environmental">Environmental</TabsTrigger>
             <TabsTrigger value="technical">Technical</TabsTrigger>
+            <TabsTrigger value="insurance">Insurance</TabsTrigger>
             <TabsTrigger value="contacts">Contacts</TabsTrigger>
           </TabsList>
           
@@ -243,6 +253,10 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
 
           <TabsContent value="technical" className="space-y-4 mt-4">
             <TechnicalTab form={form} />
+          </TabsContent>
+
+          <TabsContent value="insurance" className="space-y-4 mt-4">
+            <InsuranceTab form={form} />
           </TabsContent>
 
           <TabsContent value="contacts" className="space-y-4 mt-4">
