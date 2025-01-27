@@ -67,7 +67,7 @@ export function ContactSelect({
     },
   });
 
-  const selectedContact = contacts.find((contact) => contact.id === value);
+  const selectedContact = contacts?.find((contact) => contact.id === value);
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
@@ -83,60 +83,68 @@ export function ContactSelect({
             role="combobox"
             aria-expanded={open}
             className="w-full justify-between"
+            disabled={isLoading}
           >
-            {value && selectedContact
-              ? getContactLabel(selectedContact)
-              : placeholder}
+            {isLoading ? (
+              "Loading..."
+            ) : value && selectedContact ? (
+              getContactLabel(selectedContact)
+            ) : (
+              placeholder
+            )}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0">
           <Command>
             <CommandInput placeholder="Search contacts..." />
-            <CommandEmpty className="py-6 text-center text-sm">
-              No contacts found.
-              <div className="mt-2">
-                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create New Contact
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle>Add New Contact</DialogTitle>
-                    </DialogHeader>
-                    <ContactForm 
-                      onSuccess={() => {
-                        setIsCreateOpen(false);
-                      }}
-                      initialData={contactType ? { contact_type: contactType } : undefined}
+            {!contacts?.length ? (
+              <CommandEmpty className="py-6 text-center text-sm">
+                No contacts found.
+                <div className="mt-2">
+                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create New Contact
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Add New Contact</DialogTitle>
+                      </DialogHeader>
+                      <ContactForm 
+                        onSuccess={() => {
+                          setIsCreateOpen(false);
+                        }}
+                        initialData={contactType ? { contact_type: contactType } : undefined}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CommandEmpty>
+            ) : (
+              <CommandGroup>
+                {contacts.map((contact) => (
+                  <CommandItem
+                    key={contact.id}
+                    value={contact.id}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === contact.id ? "opacity-100" : "opacity-0"
+                      )}
                     />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </CommandEmpty>
-            <CommandGroup>
-              {contacts.map((contact) => (
-                <CommandItem
-                  key={contact.id}
-                  value={contact.id}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === contact.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {getContactLabel(contact)}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+                    {getContactLabel(contact)}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </Command>
         </PopoverContent>
       </Popover>
