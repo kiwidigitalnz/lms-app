@@ -21,7 +21,6 @@ import { EnvironmentalTab } from "./form/EnvironmentalTab";
 import { TechnicalTab } from "./form/TechnicalTab";
 import { ContactsTab } from "./form/ContactsTab";
 import { ImageUpload } from "./ImageUpload";
-import { Textarea } from "@/components/ui/textarea";
 import { InsuranceTab } from "./form/InsuranceTab";
 
 const propertySchema = z.object({
@@ -44,7 +43,6 @@ const propertySchema = z.object({
   contamination_status: z.enum(["yes", "no", "unknown"]),
   oio_sensitive: z.boolean().optional(),
   operational_consent_date: z.string().optional(),
-  notes: z.string().optional(),
   landlord_contact_ids: z.array(z.string()).optional(),
   property_manager_contact_ids: z.array(z.string()).optional(),
   site_contact_ids: z.array(z.string()).optional(),
@@ -268,20 +266,6 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
             <ContactsTab form={form} />
           </TabsContent>
         </Tabs>
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         {mode === "edit" && initialData?.id && (
           <ImageUpload 
