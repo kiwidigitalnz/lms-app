@@ -116,6 +116,118 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          address: string
+          created_at: string | null
+          floor_area: number | null
+          id: string
+          name: string
+          property_type: Database["public"]["Enums"]["property_type"]
+          tenant_id: string
+          updated_at: string | null
+          year_built: number | null
+        }
+        Insert: {
+          address: string
+          created_at?: string | null
+          floor_area?: number | null
+          id?: string
+          name: string
+          property_type: Database["public"]["Enums"]["property_type"]
+          tenant_id: string
+          updated_at?: string | null
+          year_built?: number | null
+        }
+        Update: {
+          address?: string
+          created_at?: string | null
+          floor_area?: number | null
+          id?: string
+          name?: string
+          property_type?: Database["public"]["Enums"]["property_type"]
+          tenant_id?: string
+          updated_at?: string | null
+          year_built?: number | null
+        }
+        Relationships: []
+      }
+      property_compliance: {
+        Row: {
+          compliance_type: string
+          created_at: string | null
+          due_date: string
+          id: string
+          notes: string | null
+          property_id: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          compliance_type: string
+          created_at?: string | null
+          due_date: string
+          id?: string
+          notes?: string | null
+          property_id: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          compliance_type?: string
+          created_at?: string | null
+          due_date?: string
+          id?: string
+          notes?: string | null
+          property_id?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_compliance_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_documents: {
+        Row: {
+          document_type: string
+          file_path: string
+          id: string
+          name: string
+          property_id: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          document_type: string
+          file_path: string
+          id?: string
+          name: string
+          property_id: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          document_type?: string
+          file_path?: string
+          id?: string
+          name?: string
+          property_id?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rent_reviews: {
         Row: {
           cpi_adjustment_percentage: number | null
@@ -200,6 +312,7 @@ export type Database = {
         | "monthly"
         | "quarterly"
         | "annually"
+      property_type: "commercial" | "industrial"
     }
     CompositeTypes: {
       [_ in never]: never
