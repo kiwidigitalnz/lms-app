@@ -44,7 +44,7 @@ export function ContactList() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [contactType, setContactType] = useState<Contact["contact_type"] | "">("");
+  const [contactType, setContactType] = useState<Contact["contact_type"] | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -108,14 +108,13 @@ export function ContactList() {
             className="max-w-xs"
           />
           <Select 
-            value={contactType} 
-            onValueChange={(value: Contact["contact_type"] | "") => setContactType(value)}
+            value={contactType || undefined}
+            onValueChange={(value: Contact["contact_type"]) => setContactType(value)}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All contact types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All contact types</SelectItem>
               <SelectItem value="landlord">Landlord</SelectItem>
               <SelectItem value="property_manager">Property Manager</SelectItem>
               <SelectItem value="supplier">Supplier</SelectItem>
