@@ -1,4 +1,4 @@
-import { Home, Building, FileText, Bell, Settings } from "lucide-react";
+import { Home, Building, FileText, Bell, Settings, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/AuthContext";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/" },
@@ -19,6 +20,8 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
+  const { signOut } = useAuth();
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -36,6 +39,12 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={signOut} className="flex items-center gap-3 w-full text-left">
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
