@@ -44,9 +44,9 @@ const propertySchema = z.object({
   oio_sensitive: z.boolean().optional(),
   operational_consent_date: z.string().optional(),
   notes: z.string().optional(),
-  landlord_contact_id: z.string().optional(),
-  property_manager_contact_id: z.string().optional(),
-  site_contact_id: z.string().optional(),
+  landlord_contact_ids: z.array(z.string()).optional(),
+  property_manager_contact_ids: z.array(z.string()).optional(),
+  site_contact_ids: z.array(z.string()).optional(),
   nabersnz_rating: z.string().optional(),
   green_star_rating: z.number().min(0).max(6).optional(),
   energy_performance_rating: z.string().optional(),
@@ -94,9 +94,9 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       oio_sensitive: false,
       operational_consent_date: "",
       notes: "",
-      landlord_contact_id: "",
-      property_manager_contact_id: "",
-      site_contact_id: "",
+      landlord_contact_ids: [],
+      property_manager_contact_ids: [],
+      site_contact_ids: [],
       nabersnz_rating: "",
       green_star_rating: undefined,
       energy_performance_rating: "",
@@ -127,12 +127,17 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
         year_built: data.year_built ? parseInt(data.year_built) : null,
       };
 
+      let propertyId: string;
+
       if (mode === "create") {
-        const { error } = await supabase
+        const { data: property, error } = await supabase
           .from("properties")
-          .insert(propertyData);
+          .insert(propertyData)
+          .select('id')
+          .single();
 
         if (error) throw error;
+        propertyId = property.id;
 
         toast({
           title: "Success",
@@ -145,11 +150,23 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
           .eq("id", initialData.id);
 
         if (error) throw error;
+        propertyId = initialData.id;
 
         toast({
           title: "Success",
           description: "Property updated successfully",
         });
+      }
+
+      // Handle property contacts
+      if (data.landlord_contact_ids?.length) {
+        await handlePropertyContacts(propertyId, data.landlord_contact_ids, "landlord");
+      }
+      if (data.property_manager_contact_ids?.length) {
+        await handlePropertyContacts(propertyId, data.property_manager_contact_ids, "property_manager");
+      }
+      if (data.site_contact_ids?.length) {
+        await handlePropertyContacts(propertyId, data.site_contact_ids, "site_contact");
       }
 
       queryClient.invalidateQueries({ queryKey: ["properties"] });
@@ -161,6 +178,30 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
         description: "Failed to save property",
         variant: "destructive",
       });
+    }
+  };
+
+  const handlePropertyContacts = async (propertyId: string, contactIds: string[], role: string) => {
+    // First, remove existing contacts for this role
+    await supabase
+      .from("property_contacts")
+      .delete()
+      .eq("property_id", propertyId)
+      .eq("role", role);
+
+    // Then, add new contacts
+    const contactsToInsert = contactIds.map(contactId => ({
+      property_id: propertyId,
+      contact_id: contactId,
+      role: role
+    }));
+
+    if (contactsToInsert.length > 0) {
+      const { error } = await supabase
+        .from("property_contacts")
+        .insert(contactsToInsert);
+
+      if (error) throw error;
     }
   };
 

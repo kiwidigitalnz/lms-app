@@ -17,13 +17,13 @@ export function ContactsTab({ form }: ContactsTabProps) {
     <div className="space-y-4">
       <FormField
         control={form.control}
-        name="landlord_contact_id"
+        name="landlord_contact_ids"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Landlord</FormLabel>
+            <FormLabel>Landlords</FormLabel>
             <ContactSelect
-              value={field.value}
-              onChange={field.onChange}
+              value={field.value?.[0] || ""}
+              onChange={(value) => field.onChange([value])}
               contactType="landlord"
               placeholder="Select landlord..."
             />
@@ -34,13 +34,13 @@ export function ContactsTab({ form }: ContactsTabProps) {
 
       <FormField
         control={form.control}
-        name="property_manager_contact_id"
+        name="property_manager_contact_ids"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Property Manager</FormLabel>
+            <FormLabel>Property Managers</FormLabel>
             <ContactSelect
-              value={field.value}
-              onChange={field.onChange}
+              value={field.value?.[0] || ""}
+              onChange={(value) => field.onChange([value])}
               contactType="property_manager"
               placeholder="Select property manager..."
             />
@@ -51,13 +51,13 @@ export function ContactsTab({ form }: ContactsTabProps) {
 
       <FormField
         control={form.control}
-        name="site_contact_id"
+        name="site_contact_ids"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Site Contact</FormLabel>
+            <FormLabel>Site Contacts</FormLabel>
             <ContactSelect
-              value={field.value}
-              onChange={field.onChange}
+              value={field.value?.[0] || ""}
+              onChange={(value) => field.onChange([value])}
               placeholder="Select site contact..."
             />
             <FormMessage />
