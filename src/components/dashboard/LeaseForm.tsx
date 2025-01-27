@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trash2, Plus } from "lucide-react";
 
 const leaseSchema = z.object({
   title: z.string().optional(),
@@ -26,7 +27,11 @@ const leaseSchema = z.object({
   end_date: z.string().min(1, "End date is required"),
   final_expiry_date: z.string().optional(),
   lease_renewal_notice_date: z.string().optional(),
-  rights_of_renewal: z.string().optional(),
+  rights_of_renewal: z.object({
+    number_of_rights: z.string().optional(),
+    years_per_right: z.string().optional(),
+    total_years: z.string().optional(),
+  }).optional(),
   rent_amount: z.string().min(1, "Rent amount is required"),
   payment_frequency: z.enum([
     "weekly",
@@ -37,7 +42,7 @@ const leaseSchema = z.object({
   ]),
   security_deposit: z.string().optional(),
   next_rent_review_date: z.string().optional(),
-  future_rent_review_dates: z.string().optional(),
+  future_rent_review_dates: z.array(z.string()).optional(),
   rent_review_type: z.string().optional(),
   rent_review_notes: z.string().optional(),
   current_annual_rental: z.string().optional(),
@@ -63,10 +68,24 @@ interface LeaseFormProps {
 export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Parse initial rights of renewal data if it exists
+  const initialRightsOfRenewal = initialData?.rights_of_renewal ? 
+    JSON.parse(initialData.rights_of_renewal) : 
+    { number_of_rights: '', years_per_right: '', total_years: '' };
+
+  // Parse initial future rent review dates if they exist
+  const initialReviewDates = initialData?.future_rent_review_dates ? 
+    JSON.parse(initialData.future_rent_review_dates) : 
+    [];
 
   const form = useForm<LeaseFormValues>({
     resolver: zodResolver(leaseSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      ...initialData,
+      rights_of_renewal: initialRightsOfRenewal,
+      future_rent_review_dates: initialReviewDates,
+    } : {
       title: "",
       property_name: "",
       lease_type: "commercial",
@@ -75,12 +94,16 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
       end_date: "",
       final_expiry_date: "",
       lease_renewal_notice_date: "",
-      rights_of_renewal: "",
+      rights_of_renewal: {
+        number_of_rights: '',
+        years_per_right: '',
+        total_years: '',
+      },
       rent_amount: "",
       payment_frequency: "monthly",
       security_deposit: "",
       next_rent_review_date: "",
-      future_rent_review_dates: "",
+      future_rent_review_dates: [],
       rent_review_type: "",
       rent_review_notes: "",
       current_annual_rental: "",
@@ -111,12 +134,12 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
         end_date: data.end_date,
         final_expiry_date: data.final_expiry_date || null,
         lease_renewal_notice_date: data.lease_renewal_notice_date || null,
-        rights_of_renewal: data.rights_of_renewal,
+        rights_of_renewal: JSON.stringify(data.rights_of_renewal),
         rent_amount: parseFloat(data.rent_amount),
         payment_frequency: data.payment_frequency,
         security_deposit: data.security_deposit ? parseFloat(data.security_deposit) : null,
         next_rent_review_date: data.next_rent_review_date || null,
-        future_rent_review_dates: data.future_rent_review_dates,
+        future_rent_review_dates: JSON.stringify(data.future_rent_review_dates),
         rent_review_type: data.rent_review_type,
         rent_review_notes: data.rent_review_notes,
         current_annual_rental: data.current_annual_rental ? parseFloat(data.current_annual_rental) : null,
@@ -168,6 +191,35 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
       });
     }
   };
+
+  // Function to add a new review date
+  const addReviewDate = () => {
+    const currentDates = form.getValues('future_rent_review_dates') || [];
+    form.setValue('future_rent_review_dates', [...currentDates, '']);
+  };
+
+  // Function to remove a review date
+  const removeReviewDate = (index: number) => {
+    const currentDates = form.getValues('future_rent_review_dates') || [];
+    form.setValue('future_rent_review_dates', 
+      currentDates.filter((_, i) => i !== index)
+    );
+  };
+
+  // Calculate total years when either number of rights or years per right changes
+  React.useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name?.startsWith('rights_of_renewal.')) {
+        const rights = form.getValues('rights_of_renewal');
+        if (rights.number_of_rights && rights.years_per_right) {
+          const total = Number(rights.number_of_rights) * Number(rights.years_per_right);
+          form.setValue('rights_of_renewal.total_years', String(total));
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <Form {...form}>
@@ -306,48 +358,90 @@ export function LeaseForm({ onSuccess, initialData, mode = "create" }: LeaseForm
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="rights_of_renewal"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Rights of Renewal</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <FormField
+                  control={form.control}
+                  name="rights_of_renewal.number_of_rights"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Rights</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="next_rent_review_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Next Rent Review Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="rights_of_renewal.years_per_right"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Years per Right</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="future_rent_review_dates"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Future Rent Review Dates</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="rights_of_renewal.total_years"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Total Years</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} disabled />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <FormLabel>Future Rent Review Dates</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addReviewDate}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Date
+                </Button>
+              </div>
+              
+              {form.watch('future_rent_review_dates')?.map((_, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`future_rent_review_dates.${index}`}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeReviewDate(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </TabsContent>
 
