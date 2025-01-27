@@ -65,9 +65,12 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
       
       if (!user) throw new Error("No user found");
 
+      // Ensure all required fields are present and properly typed
       const contactData = {
         ...data,
         tenant_id: user.id,
+        first_name: data.first_name, // Required field
+        contact_type: data.contact_type, // Required field
       };
 
       if (mode === "create") {
