@@ -8,9 +8,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/" },
@@ -22,6 +25,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const { signOut } = useAuth();
+  const location = useLocation();
 
   return (
     <Sidebar>
@@ -32,24 +36,38 @@ export function AppSidebar() {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton 
+                        asChild 
+                        data-active={location.pathname === item.url}
+                      >
+                        <Link to={item.url} className="flex items-center gap-3">
+                          <item.icon className="h-4 w-4" />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      {item.title}
+                    </TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
               ))}
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={signOut} className="flex items-center gap-3 w-full text-left">
-                  <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="p-2 flex flex-col gap-2">
+        <SidebarMenuButton 
+          onClick={signOut} 
+          className="flex items-center gap-3 w-full text-left"
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Sign Out</span>
+        </SidebarMenuButton>
+        <SidebarTrigger className="w-full" />
+      </SidebarFooter>
     </Sidebar>
   );
 }
