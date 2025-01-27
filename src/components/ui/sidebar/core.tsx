@@ -7,9 +7,10 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { SidebarContext, useSidebar, SidebarState } from "./context"
 
+// Adjust the icon width to be narrower
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "4rem"
+const SIDEBAR_WIDTH_ICON = "3.5rem" // Changed from 4rem to 3.5rem for a tighter collapsed state
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
@@ -86,7 +87,7 @@ export const Sidebar = React.forwardRef<
             variant === "floating" || variant === "inset"
               ? "p-2"
               : "border-r",
-            state === "expanded" ? "w-64" : "w-16"
+            state === "expanded" ? "w-64" : "w-14" // Changed from w-16 to w-14 for tighter collapsed state
           )}
           style={
             {

@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "react-router-dom";
@@ -25,6 +26,7 @@ const menuItems = [
 export function AppSidebar() {
   const { signOut } = useAuth();
   const location = useLocation();
+  const { state } = useSidebar();
 
   return (
     <Sidebar className="fixed left-0 top-0 z-20 h-full">
@@ -32,7 +34,9 @@ export function AppSidebar() {
         <div className="relative">
           <SidebarTrigger className="absolute right-2 top-2 z-50" />
           <SidebarGroup>
-            <SidebarGroupLabel>Property Management</SidebarGroupLabel>
+            <SidebarGroupLabel className={state === "collapsed" ? "hidden" : ""}>
+              Property Management
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {menuItems.map((item) => (
