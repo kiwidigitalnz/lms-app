@@ -181,7 +181,7 @@ export const SidebarProvider = React.forwardRef<
         : setOpen((open) => !open)
     }, [isMobile, setOpen, setOpenMobile])
 
-    const state = open ? "expanded" : "collapsed"
+    const state = open ? "expanded" : "collapsed" as const // Type assertion to ensure correct type
 
     const contextValue = React.useMemo(
       () => ({
