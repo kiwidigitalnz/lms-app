@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -86,7 +86,10 @@ export function ContactSelect({
             disabled={isLoading}
           >
             {isLoading ? (
-              "Loading..."
+              <div className="flex items-center">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </div>
             ) : value && selectedContact ? (
               getContactLabel(selectedContact)
             ) : (
@@ -98,7 +101,12 @@ export function ContactSelect({
         <PopoverContent className="w-[400px] p-0">
           <Command>
             <CommandInput placeholder="Search contacts..." />
-            {!contacts?.length ? (
+            {isLoading ? (
+              <div className="py-6 text-center text-sm">
+                <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                <p className="mt-2">Loading contacts...</p>
+              </div>
+            ) : contacts.length === 0 ? (
               <CommandEmpty className="py-6 text-center text-sm">
                 No contacts found.
                 <div className="mt-2">
