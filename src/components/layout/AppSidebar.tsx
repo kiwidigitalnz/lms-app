@@ -29,7 +29,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
 
   return (
-    <Sidebar className="fixed left-0 top-0 z-20 h-screen">
+    <Sidebar className="h-screen">
       <SidebarContent>
         <div className="relative h-full">
           <div className="absolute right-0 top-0 p-2 z-50">

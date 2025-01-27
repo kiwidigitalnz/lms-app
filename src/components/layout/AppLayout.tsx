@@ -11,10 +11,10 @@ interface AppLayoutProps {
 export function AppLayout({ children, title, description }: AppLayoutProps) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="grid grid-cols-[auto,1fr] min-h-screen">
         <AppSidebar />
-        <div className="flex-1 transition-all duration-300 ease-in-out ml-14 group-data-[state=expanded]:ml-64">
-          <main className="container mx-auto p-8">
+        <main className="w-full">
+          <div className="container mx-auto p-8">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold">{title}</h1>
@@ -27,8 +27,8 @@ export function AppLayout({ children, title, description }: AppLayoutProps) {
               </div>
             </div>
             {children}
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </SidebarProvider>
   );
