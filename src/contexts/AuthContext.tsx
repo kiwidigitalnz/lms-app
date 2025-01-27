@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
@@ -17,43 +18,58 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check active sessions and subscribe to auth changes
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Initialize session and set up auth state listener
+    const initializeAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+        // Set up auth state change subscription
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (_event, currentSession) => {
+            setSession(currentSession);
+            setUser(currentSession?.user ?? null);
+            setLoading(false);
+          }
+        );
 
-    return () => subscription.unsubscribe();
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   // Fetch user role when user changes
   useEffect(() => {
     async function getUserRole() {
       if (user) {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .single();
+        try {
+          const { data, error } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .single();
 
-        if (error) {
+          if (error) throw error;
+          setUserRole(data.role);
+        } catch (error) {
           console.error("Error fetching user role:", error);
-          return;
+          setUserRole(null);
         }
-
-        setUserRole(data.role);
       } else {
         setUserRole(null);
       }
@@ -74,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.success("Successfully signed in!");
     } catch (error: any) {
       toast.error(error.message);
+      throw error;
     }
   };
 
@@ -99,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.success("Successfully signed up! Please check your email for verification.");
     } catch (error: any) {
       toast.error(error.message);
+      throw error;
     }
   };
 
@@ -110,11 +128,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.success("Successfully signed out!");
     } catch (error: any) {
       toast.error(error.message);
+      throw error;
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, userRole }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut, 
+      userRole 
+    }}>
       {children}
     </AuthContext.Provider>
   );
