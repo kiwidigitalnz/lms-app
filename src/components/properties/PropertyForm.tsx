@@ -139,8 +139,9 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       const propertyData = {
         ...data,
         tenant_id: user.id,
-        name: data.name || "",  // Ensure name is not undefined
-        address: data.address || "", // Ensure address is not undefined
+        name: data.name,
+        address: data.address,
+        property_type: data.property_type,
         floor_area: data.floor_area ? parseFloat(data.floor_area) : null,
         site_area: data.site_area ? parseFloat(data.site_area) : null,
         year_built: data.year_built ? parseInt(data.year_built) : null,
