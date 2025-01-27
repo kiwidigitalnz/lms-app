@@ -1,17 +1,14 @@
-import { Building } from "lucide-react";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { PropertyList } from "@/components/properties/PropertyList";
 
 const Properties = () => {
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-3xl font-bold">Properties</h1>
-        <p className="text-muted-foreground">
-          Manage your commercial and industrial properties
-        </p>
-      </div>
+    <AppLayout 
+      title="Properties" 
+      description="Manage your property portfolio"
+    >
       <PropertyList />
-    </div>
+    </AppLayout>
   );
 };
 
