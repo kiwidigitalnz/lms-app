@@ -50,9 +50,9 @@ const Index = () => {
         <main className="flex-1 p-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold">My Rentals</h1>
+              <h1 className="text-3xl font-bold">Lease Management</h1>
               <p className="text-muted-foreground">
-                Manage your rental agreements and payments
+                Manage your commercial and industrial lease agreements
               </p>
             </div>
             <SidebarTrigger />
@@ -60,22 +60,22 @@ const Index = () => {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
             <StatCard
-              title="My Properties"
+              title="Leased Properties"
               value={stats?.totalLeases.toString() || "0"}
               icon={<Building className="h-4 w-4 text-muted-foreground" />}
             />
             <StatCard
-              title="Active Rentals"
+              title="Active Leases"
               value={stats?.totalLeases.toString() || "0"}
               icon={<FileText className="h-4 w-4 text-muted-foreground" />}
             />
             <StatCard
-              title="Landlords"
+              title="Property Owners"
               value={stats?.totalLeases.toString() || "0"}
               icon={<Users className="h-4 w-4 text-muted-foreground" />}
             />
             <StatCard
-              title="Monthly Rent"
+              title="Monthly Lease Expenses"
               value={`$${(stats?.monthlyExpenses || 0).toLocaleString()}`}
               icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
             />
@@ -83,9 +83,9 @@ const Index = () => {
 
           <div className="space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">Your Rental Agreements</h2>
+              <h2 className="text-2xl font-bold">Your Lease Agreements</h2>
               <p className="text-muted-foreground">
-                Track and manage your rental properties
+                Track and manage your commercial and industrial property leases
               </p>
             </div>
             <LeaseList />

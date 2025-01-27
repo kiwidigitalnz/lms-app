@@ -51,7 +51,7 @@ export function LeaseList() {
 
       toast({
         title: "Success",
-        description: "Rental agreement deleted successfully",
+        description: "Lease agreement deleted successfully",
       });
 
       queryClient.invalidateQueries({ queryKey: ["leases"] });
@@ -59,14 +59,14 @@ export function LeaseList() {
       console.error("Error deleting lease:", error);
       toast({
         title: "Error",
-        description: "Failed to delete rental agreement",
+        description: "Failed to delete lease agreement",
         variant: "destructive",
       });
     }
   };
 
   if (isLoading) {
-    return <div>Loading rental agreements...</div>;
+    return <div>Loading lease agreements...</div>;
   }
 
   return (
@@ -76,12 +76,12 @@ export function LeaseList() {
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2" />
-              Add Rental Agreement
+              Add Lease Agreement
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Add New Rental Agreement</DialogTitle>
+              <DialogTitle>Add New Lease Agreement</DialogTitle>
             </DialogHeader>
             <LeaseForm onSuccess={() => setIsCreateOpen(false)} />
           </DialogContent>
@@ -96,7 +96,7 @@ export function LeaseList() {
               <TableHead>Type</TableHead>
               <TableHead>Start Date</TableHead>
               <TableHead>End Date</TableHead>
-              <TableHead className="text-right">Rent Amount</TableHead>
+              <TableHead className="text-right">Lease Amount</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -126,7 +126,7 @@ export function LeaseList() {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>Edit Rental Agreement</DialogTitle>
+                        <DialogTitle>Edit Lease Agreement</DialogTitle>
                       </DialogHeader>
                       <LeaseForm
                         mode="edit"
@@ -148,7 +148,7 @@ export function LeaseList() {
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>Record Rent Review</DialogTitle>
+                        <DialogTitle>Record Lease Review</DialogTitle>
                       </DialogHeader>
                       <RentReviewForm
                         leaseId={lease.id}
@@ -173,7 +173,7 @@ export function LeaseList() {
                 <TableCell colSpan={6} className="text-center py-8">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <FileText className="h-8 w-8" />
-                    <p>No rental agreements found</p>
+                    <p>No lease agreements found</p>
                   </div>
                 </TableCell>
               </TableRow>
