@@ -29,7 +29,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
 
   return (
-    <Sidebar className="fixed left-0 top-0 z-20 h-full">
+    <Sidebar className="fixed left-0 top-0 z-20 h-screen">
       <SidebarContent>
         <div className="relative h-full">
           <div className="absolute right-0 top-0 p-2 z-50">
@@ -46,11 +46,11 @@ export function AppSidebar() {
                     <SidebarMenuButton 
                       asChild 
                       isActive={location.pathname === item.url}
-                      tooltip={item.title}
+                      tooltip={state === "collapsed" ? item.title : undefined}
                     >
                       <Link to={item.url} className="flex items-center gap-3">
                         <item.icon className="h-4 w-4 shrink-0" />
-                        <span>{item.title}</span>
+                        <span className={state === "collapsed" ? "hidden" : ""}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -64,10 +64,10 @@ export function AppSidebar() {
         <SidebarMenuButton 
           onClick={signOut} 
           className="flex items-center gap-3 w-full text-left"
-          tooltip="Sign Out"
+          tooltip={state === "collapsed" ? "Sign Out" : undefined}
         >
           <LogOut className="h-4 w-4 shrink-0" />
-          <span>Sign Out</span>
+          <span className={state === "collapsed" ? "hidden" : ""}>Sign Out</span>
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
