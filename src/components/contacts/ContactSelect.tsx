@@ -49,7 +49,7 @@ export function ContactSelect({
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { data: contacts, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       let query = supabase
@@ -67,7 +67,8 @@ export function ContactSelect({
     },
   });
 
-  const selectedContact = contacts?.find((contact) => contact.id === value);
+  const contacts = data || [];
+  const selectedContact = contacts.find((contact) => contact.id === value);
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
@@ -101,58 +102,60 @@ export function ContactSelect({
         <PopoverContent className="w-[400px] p-0">
           <Command>
             <CommandInput placeholder="Search contacts..." />
-            {isLoading ? (
-              <div className="py-6 text-center text-sm">
-                <Loader2 className="mx-auto h-4 w-4 animate-spin" />
-                <p className="mt-2">Loading contacts...</p>
-              </div>
-            ) : contacts && contacts.length > 0 ? (
-              <CommandGroup>
-                {contacts.map((contact) => (
-                  <CommandItem
-                    key={contact.id}
-                    value={contact.id}
-                    onSelect={(currentValue) => {
-                      onChange(currentValue);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === contact.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {getContactLabel(contact)}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ) : (
-              <CommandEmpty className="py-6 text-center text-sm">
-                No contacts found.
-                <div className="mt-2">
-                  <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create New Contact
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle>Add New Contact</DialogTitle>
-                      </DialogHeader>
-                      <ContactForm 
-                        onSuccess={() => {
-                          setIsCreateOpen(false);
-                        }}
-                        initialData={contactType ? { contact_type: contactType } : undefined}
-                      />
-                    </DialogContent>
-                  </Dialog>
+            <div className="max-h-[300px] overflow-y-auto">
+              {isLoading ? (
+                <div className="py-6 text-center text-sm">
+                  <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                  <p className="mt-2">Loading contacts...</p>
                 </div>
-              </CommandEmpty>
-            )}
+              ) : contacts && contacts.length > 0 ? (
+                <CommandGroup>
+                  {contacts.map((contact) => (
+                    <CommandItem
+                      key={contact.id}
+                      value={contact.id}
+                      onSelect={(currentValue) => {
+                        onChange(currentValue);
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === contact.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {getContactLabel(contact)}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ) : (
+                <CommandEmpty className="py-6 text-center text-sm">
+                  No contacts found.
+                  <div className="mt-2">
+                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Create New Contact
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Add New Contact</DialogTitle>
+                        </DialogHeader>
+                        <ContactForm 
+                          onSuccess={() => {
+                            setIsCreateOpen(false);
+                          }}
+                          initialData={contactType ? { contact_type: contactType } : undefined}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </CommandEmpty>
+              )}
+            </div>
           </Command>
         </PopoverContent>
       </Popover>
