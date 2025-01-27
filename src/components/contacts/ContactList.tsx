@@ -29,13 +29,22 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
-type ContactType = "landlord" | "property_manager" | "supplier" | "tenant" | "other";
+type Contact = {
+  id: string;
+  first_name: string;
+  last_name: string | null;
+  company: string | null;
+  email: string | null;
+  phone: string | null;
+  mobile: string | null;
+  contact_type: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
+};
 
 export function ContactList() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingContact, setEditingContact] = useState<any>(null);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [contactType, setContactType] = useState<ContactType | "">("");
+  const [contactType, setContactType] = useState<Contact["contact_type"] | "">("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -58,7 +67,7 @@ export function ContactList() {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data;
+      return data as Contact[];
     },
   });
 
@@ -98,7 +107,10 @@ export function ContactList() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="max-w-xs"
           />
-          <Select value={contactType} onValueChange={(value: ContactType | "") => setContactType(value)}>
+          <Select 
+            value={contactType} 
+            onValueChange={(value: Contact["contact_type"] | "") => setContactType(value)}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All contact types" />
             </SelectTrigger>
