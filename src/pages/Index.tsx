@@ -3,6 +3,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { LeaseList } from "@/components/dashboard/LeaseList";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { NotificationList } from "@/components/notifications/NotificationList";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -50,22 +51,25 @@ const Index = () => {
         <main className="flex-1 p-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold">Lease Management</h1>
+              <h1 className="text-3xl font-bold">Commercial Lease Management</h1>
               <p className="text-muted-foreground">
                 Manage your commercial and industrial lease agreements
               </p>
             </div>
-            <SidebarTrigger />
+            <div className="flex items-center gap-2">
+              <NotificationList />
+              <SidebarTrigger />
+            </div>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
             <StatCard
-              title="Leased Properties"
+              title="Active Leases"
               value={stats?.totalLeases.toString() || "0"}
               icon={<Building className="h-4 w-4 text-muted-foreground" />}
             />
             <StatCard
-              title="Active Leases"
+              title="Lease Agreements"
               value={stats?.totalLeases.toString() || "0"}
               icon={<FileText className="h-4 w-4 text-muted-foreground" />}
             />
