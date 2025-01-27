@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { NotificationList } from "@/components/notifications/NotificationList";
 
@@ -23,7 +23,6 @@ export function AppLayout({ children, title, description }: AppLayoutProps) {
             </div>
             <div className="flex items-center gap-2">
               <NotificationList />
-              <SidebarTrigger />
             </div>
           </div>
           {children}

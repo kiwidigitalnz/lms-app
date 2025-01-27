@@ -1,4 +1,4 @@
-import { Home, Building, FileText, Bell, Settings, LogOut } from "lucide-react";
+import { Home, Building, FileText, Bell, Settings, LogOut, ChevronLeft } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -29,27 +29,30 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Property Management</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={location.pathname === item.url}
-                    tooltip={item.title}
-                  >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <div className="relative">
+          <SidebarTrigger className="absolute right-2 top-2 z-50" />
+          <SidebarGroup>
+            <SidebarGroupLabel>Property Management</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton 
+                      asChild 
+                      isActive={location.pathname === item.url}
+                      tooltip={item.title}
+                    >
+                      <Link to={item.url} className="flex items-center gap-3">
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </div>
       </SidebarContent>
       <SidebarFooter className="p-2 flex flex-col gap-2">
         <SidebarMenuButton 
@@ -57,7 +60,7 @@ export function AppSidebar() {
           className="flex items-center gap-3 w-full text-left"
           tooltip="Sign Out"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="h-4 w-4 shrink-0" />
           <span>Sign Out</span>
         </SidebarMenuButton>
       </SidebarFooter>

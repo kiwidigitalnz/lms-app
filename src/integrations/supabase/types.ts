@@ -9,6 +9,90 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      contacts: {
+        Row: {
+          company: string | null
+          contact_type: Database["public"]["Enums"]["contact_type"]
+          created_at: string | null
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string | null
+          mobile: string | null
+          notes: string | null
+          phone: string | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          company?: string | null
+          contact_type: Database["public"]["Enums"]["contact_type"]
+          created_at?: string | null
+          email?: string | null
+          first_name: string
+          id?: string
+          last_name?: string | null
+          mobile?: string | null
+          notes?: string | null
+          phone?: string | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          company?: string | null
+          contact_type?: Database["public"]["Enums"]["contact_type"]
+          created_at?: string | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string | null
+          mobile?: string | null
+          notes?: string | null
+          phone?: string | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      lease_contacts: {
+        Row: {
+          contact_id: string
+          created_at: string | null
+          id: string
+          lease_id: string
+          role: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string | null
+          id?: string
+          lease_id: string
+          role: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string | null
+          id?: string
+          lease_id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lease_contacts_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lease_contacts_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lease_notifications: {
         Row: {
           created_at: string | null
@@ -193,6 +277,45 @@ export type Database = {
           },
         ]
       }
+      property_contacts: {
+        Row: {
+          contact_id: string
+          created_at: string | null
+          id: string
+          property_id: string
+          role: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string | null
+          id?: string
+          property_id: string
+          role: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string | null
+          id?: string
+          property_id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_contacts_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_contacts_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       property_documents: {
         Row: {
           document_type: string
@@ -305,6 +428,12 @@ export type Database = {
     }
     Enums: {
       app_role: "super_user" | "client_admin" | "tenant_user"
+      contact_type:
+        | "landlord"
+        | "property_manager"
+        | "supplier"
+        | "tenant"
+        | "other"
       lease_type: "commercial" | "residential" | "industrial"
       payment_frequency:
         | "weekly"
