@@ -48,12 +48,15 @@ export function ContactSelect({
   contactType,
   placeholder = "Select contact..."
 }: ContactSelectProps) {
+  console.log("ContactSelect rendered with value:", value);
+  
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
+      console.log("Fetching contacts for type:", contactType);
       let query = supabase
         .from("contacts")
         .select("id, first_name, last_name, company, contact_type")
@@ -65,12 +68,14 @@ export function ContactSelect({
 
       const { data, error } = await query;
       if (error) throw error;
+      console.log("Fetched contacts:", data);
       return (data || []) as Contact[];
     },
   });
 
   const contacts = data || [];
   const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
+  console.log("Selected contacts:", selectedContacts);
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
@@ -78,14 +83,20 @@ export function ContactSelect({
   };
 
   const handleSelect = (contactId: string) => {
-    setOpen(false); // Close popover after selection
+    console.log("handleSelect called with contactId:", contactId);
+    console.log("Current value:", value);
+    
     const newValue = value.includes(contactId)
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
+    
+    console.log("New value to be set:", newValue);
     onChange(newValue);
+    setOpen(false);
   };
 
   const removeContact = (contactId: string) => {
+    console.log("removeContact called with contactId:", contactId);
     onChange(value.filter(id => id !== contactId));
   };
 
