@@ -49,7 +49,7 @@ export function ContactSelect({
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { data: contacts = [], isLoading } = useQuery({
+  const { data: contacts, isLoading } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       let query = supabase
@@ -63,7 +63,7 @@ export function ContactSelect({
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Contact[];
+      return (data || []) as Contact[];
     },
   });
 
@@ -106,7 +106,28 @@ export function ContactSelect({
                 <Loader2 className="mx-auto h-4 w-4 animate-spin" />
                 <p className="mt-2">Loading contacts...</p>
               </div>
-            ) : contacts.length === 0 ? (
+            ) : contacts && contacts.length > 0 ? (
+              <CommandGroup>
+                {contacts.map((contact) => (
+                  <CommandItem
+                    key={contact.id}
+                    value={contact.id}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === contact.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {getContactLabel(contact)}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ) : (
               <CommandEmpty className="py-6 text-center text-sm">
                 No contacts found.
                 <div className="mt-2">
@@ -131,27 +152,6 @@ export function ContactSelect({
                   </Dialog>
                 </div>
               </CommandEmpty>
-            ) : (
-              <CommandGroup>
-                {contacts.map((contact) => (
-                  <CommandItem
-                    key={contact.id}
-                    value={contact.id}
-                    onSelect={(currentValue) => {
-                      onChange(currentValue);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === contact.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {getContactLabel(contact)}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
             )}
           </Command>
         </PopoverContent>
