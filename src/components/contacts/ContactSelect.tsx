@@ -134,40 +134,61 @@ export function ContactSelect({
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
-              </div>
-            ) : selectedContacts.length > 0 ? (
-              <span className="truncate">
-                {`${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'} selected`}
-              </span>
-            ) : (
-              placeholder
-            )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0">
-          <Command>
-            <CommandInput placeholder="Search contacts..." />
-            <CommandList>
-              {renderCommandContent()}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </div>
+              ) : selectedContacts.length > 0 ? (
+                <span className="truncate">
+                  {`${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'} selected`}
+                </span>
+              ) : (
+                placeholder
+              )}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[400px] p-0">
+            <Command>
+              <CommandInput placeholder="Search contacts..." />
+              <CommandList>
+                {renderCommandContent()}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+
+        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="icon" className="shrink-0">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Add New Contact</DialogTitle>
+            </DialogHeader>
+            <ContactForm 
+              onSuccess={() => {
+                setIsCreateOpen(false);
+              }}
+              initialData={contactType ? { contact_type: contactType } : undefined}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {selectedContacts.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -185,25 +206,6 @@ export function ContactSelect({
           ))}
         </div>
       )}
-
-      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="icon" className="shrink-0">
-            <Plus className="h-4 w-4" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Add New Contact</DialogTitle>
-          </DialogHeader>
-          <ContactForm 
-            onSuccess={() => {
-              setIsCreateOpen(false);
-            }}
-            initialData={contactType ? { contact_type: contactType } : undefined}
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
