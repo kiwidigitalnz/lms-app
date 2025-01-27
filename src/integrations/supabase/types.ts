@@ -9,6 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      lease_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          lease_id: string | null
+          notification_date: string
+          notification_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          lease_id?: string | null
+          notification_date: string
+          notification_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          lease_id?: string | null
+          notification_date?: string
+          notification_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lease_notifications_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leases: {
+        Row: {
+          created_at: string | null
+          end_date: string
+          id: string
+          lease_type: Database["public"]["Enums"]["lease_type"]
+          payment_frequency: Database["public"]["Enums"]["payment_frequency"]
+          property_name: string
+          rent_amount: number
+          security_deposit: number | null
+          start_date: string
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_date: string
+          id?: string
+          lease_type: Database["public"]["Enums"]["lease_type"]
+          payment_frequency: Database["public"]["Enums"]["payment_frequency"]
+          property_name: string
+          rent_amount: number
+          security_deposit?: number | null
+          start_date: string
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          lease_type?: Database["public"]["Enums"]["lease_type"]
+          payment_frequency?: Database["public"]["Enums"]["payment_frequency"]
+          property_name?: string
+          rent_amount?: number
+          security_deposit?: number | null
+          start_date?: string
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company: string | null
@@ -38,6 +115,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      rent_reviews: {
+        Row: {
+          cpi_adjustment_percentage: number | null
+          created_at: string | null
+          id: string
+          lease_id: string | null
+          new_amount: number
+          notes: string | null
+          previous_amount: number
+          review_date: string
+        }
+        Insert: {
+          cpi_adjustment_percentage?: number | null
+          created_at?: string | null
+          id?: string
+          lease_id?: string | null
+          new_amount: number
+          notes?: string | null
+          previous_amount: number
+          review_date: string
+        }
+        Update: {
+          cpi_adjustment_percentage?: number | null
+          created_at?: string | null
+          id?: string
+          lease_id?: string | null
+          new_amount?: number
+          notes?: string | null
+          previous_amount?: number
+          review_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rent_reviews_lease_id_fkey"
+            columns: ["lease_id"]
+            isOneToOne: false
+            referencedRelation: "leases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -75,6 +193,13 @@ export type Database = {
     }
     Enums: {
       app_role: "super_user" | "client_admin" | "tenant_user"
+      lease_type: "commercial" | "residential" | "industrial"
+      payment_frequency:
+        | "weekly"
+        | "fortnightly"
+        | "monthly"
+        | "quarterly"
+        | "annually"
     }
     CompositeTypes: {
       [_ in never]: never
