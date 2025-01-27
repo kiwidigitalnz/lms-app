@@ -29,11 +29,13 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 
+type ContactType = "landlord" | "property_manager" | "supplier" | "tenant" | "other";
+
 export function ContactList() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [contactType, setContactType] = useState<string>("");
+  const [contactType, setContactType] = useState<ContactType | "">("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -96,7 +98,7 @@ export function ContactList() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="max-w-xs"
           />
-          <Select value={contactType} onValueChange={setContactType}>
+          <Select value={contactType} onValueChange={(value: ContactType | "") => setContactType(value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="All contact types" />
             </SelectTrigger>

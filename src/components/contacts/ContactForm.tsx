@@ -54,7 +54,7 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
       email: "",
       phone: "",
       mobile: "",
-      contact_type: "other",
+      contact_type: "other" as const,
       notes: "",
     },
   });
