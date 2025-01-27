@@ -8,6 +8,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -75,6 +76,54 @@ export function ContactSelect({
     return contact.company ? `${name} (${contact.company})` : name;
   };
 
+  const renderCommandContent = () => {
+    if (isLoading) {
+      return (
+        <div className="py-6 text-center text-sm">
+          <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+          <p className="mt-2">Loading contacts...</p>
+        </div>
+      );
+    }
+
+    if (!contacts || contacts.length === 0) {
+      return (
+        <CommandEmpty className="py-6 text-center text-sm">
+          No contacts found.
+          <div className="mt-2">
+            <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Contact
+            </Button>
+          </div>
+        </CommandEmpty>
+      );
+    }
+
+    return (
+      <CommandGroup>
+        {contacts.map((contact) => (
+          <CommandItem
+            key={contact.id}
+            value={contact.id}
+            onSelect={(currentValue) => {
+              onChange(currentValue);
+              setOpen(false);
+            }}
+          >
+            <Check
+              className={cn(
+                "mr-2 h-4 w-4",
+                value === contact.id ? "opacity-100" : "opacity-0"
+              )}
+            />
+            {getContactLabel(contact)}
+          </CommandItem>
+        ))}
+      </CommandGroup>
+    );
+  };
+
   return (
     <div className="flex gap-2">
       <Popover open={open} onOpenChange={setOpen}>
@@ -102,60 +151,9 @@ export function ContactSelect({
         <PopoverContent className="w-[400px] p-0">
           <Command>
             <CommandInput placeholder="Search contacts..." />
-            <div className="max-h-[300px] overflow-y-auto">
-              {isLoading ? (
-                <div className="py-6 text-center text-sm">
-                  <Loader2 className="mx-auto h-4 w-4 animate-spin" />
-                  <p className="mt-2">Loading contacts...</p>
-                </div>
-              ) : contacts && contacts.length > 0 ? (
-                <CommandGroup>
-                  {contacts.map((contact) => (
-                    <CommandItem
-                      key={contact.id}
-                      value={contact.id}
-                      onSelect={(currentValue) => {
-                        onChange(currentValue);
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === contact.id ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {getContactLabel(contact)}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              ) : (
-                <CommandEmpty className="py-6 text-center text-sm">
-                  No contacts found.
-                  <div className="mt-2">
-                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Plus className="mr-2 h-4 w-4" />
-                          Create New Contact
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Add New Contact</DialogTitle>
-                        </DialogHeader>
-                        <ContactForm 
-                          onSuccess={() => {
-                            setIsCreateOpen(false);
-                          }}
-                          initialData={contactType ? { contact_type: contactType } : undefined}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </CommandEmpty>
-              )}
-            </div>
+            <CommandList>
+              {renderCommandContent()}
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
