@@ -7,9 +7,9 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { SidebarContext, useSidebar } from "./context"
 
-const SIDEBAR_WIDTH = "16rem"
-const SIDEBAR_WIDTH_ICON = "3.5rem"
-const SIDEBAR_WIDTH_MOBILE = "18rem"
+const SIDEBAR_WIDTH = "18rem" // Increased from 16rem
+const SIDEBAR_WIDTH_ICON = "4rem" // Increased from 3.5rem
+const SIDEBAR_WIDTH_MOBILE = "20rem" // Increased from 18rem
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
@@ -36,7 +36,7 @@ export const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            "flex h-full flex-col bg-sidebar text-sidebar-foreground",
+            "flex h-full flex-col bg-sidebar text-sidebar-foreground shadow-lg",
             className
           )}
           ref={ref}
@@ -53,7 +53,7 @@ export const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground"
+            className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground shadow-lg"
             style={
               {
                 "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -71,8 +71,8 @@ export const Sidebar = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "group h-full bg-sidebar text-sidebar-foreground transition-[width] duration-300 ease-in-out",
-          state === "expanded" ? "w-64" : "w-14",
+          "group relative h-full bg-sidebar text-sidebar-foreground transition-[width] duration-300 ease-in-out shadow-lg",
+          state === "expanded" ? "w-72" : "w-16",
           className
         )}
         data-state={state}
@@ -107,7 +107,7 @@ export const SidebarTrigger = React.forwardRef<
       variant="ghost"
       size="icon"
       className={cn(
-        "h-7 w-7 transition-transform",
+        "h-8 w-8 transition-transform duration-300 hover:bg-sidebar-accent/10",
         state === "collapsed" && "rotate-180",
         className
       )}
