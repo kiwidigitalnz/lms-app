@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Building, Plus, Pencil, Trash2, FileText } from "lucide-react";
+import { Building, Plus, Pencil, Trash2, Image } from "lucide-react";
 import { PropertyForm } from "./PropertyForm";
 import {
   Dialog,
@@ -20,6 +20,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export function PropertyList() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -30,13 +35,31 @@ export function PropertyList() {
   const { data: properties, isLoading } = useQuery({
     queryKey: ["properties"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: propertiesData, error: propertiesError } = await supabase
         .from("properties")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      return data;
+      if (propertiesError) throw propertiesError;
+
+      // Fetch images for each property
+      const propertiesWithImages = await Promise.all(
+        propertiesData.map(async (property) => {
+          const { data: images, error: imagesError } = await supabase
+            .from("property_images")
+            .select("file_path")
+            .eq("property_id", property.id);
+
+          if (imagesError) throw imagesError;
+
+          return {
+            ...property,
+            images: images || [],
+          };
+        })
+      );
+
+      return propertiesWithImages;
     },
   });
 
@@ -76,7 +99,7 @@ export function PropertyList() {
               Add Property
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>Add New Property</DialogTitle>
             </DialogHeader>
@@ -92,6 +115,7 @@ export function PropertyList() {
               <TableHead>Property Name</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Address</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Floor Area</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -99,9 +123,33 @@ export function PropertyList() {
           <TableBody>
             {properties?.map((property) => (
               <TableRow key={property.id}>
-                <TableCell className="font-medium">{property.name}</TableCell>
+                <TableCell className="font-medium">
+                  <div className="flex items-center space-x-2">
+                    {property.name}
+                    {property.images?.length > 0 && (
+                      <HoverCard>
+                        <HoverCardTrigger>
+                          <Image className="h-4 w-4 text-gray-500" />
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-80">
+                          <div className="grid grid-cols-2 gap-2">
+                            {property.images.slice(0, 4).map((image: any, index: number) => (
+                              <img
+                                key={index}
+                                src={`${supabase.storage.from('property-images').getPublicUrl(image.file_path).data.publicUrl}`}
+                                alt={`Property ${index + 1}`}
+                                className="h-24 w-full object-cover rounded"
+                              />
+                            ))}
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell className="capitalize">{property.property_type}</TableCell>
                 <TableCell>{property.address}</TableCell>
+                <TableCell>{property.ownership_status}</TableCell>
                 <TableCell className="text-right">
                   {property.floor_area ? `${property.floor_area.toLocaleString()} sq ft` : "-"}
                 </TableCell>
@@ -116,7 +164,7 @@ export function PropertyList() {
                         <Pencil className="h-4 w-4" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-4xl">
                       <DialogHeader>
                         <DialogTitle>Edit Property</DialogTitle>
                       </DialogHeader>
@@ -140,7 +188,7 @@ export function PropertyList() {
             ))}
             {properties?.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
+                <TableCell colSpan={6} className="text-center py-8">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <Building className="h-8 w-8" />
                     <p>No properties found</p>

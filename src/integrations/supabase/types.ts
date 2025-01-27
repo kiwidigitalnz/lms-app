@@ -302,33 +302,63 @@ export type Database = {
       properties: {
         Row: {
           address: string
+          asbestos_status: string | null
+          contamination_status: string | null
           created_at: string | null
+          description: string | null
           floor_area: number | null
           id: string
+          insurance_expiry_date: string | null
+          insurance_status: string | null
           name: string
+          notes: string | null
+          oio_sensitive: boolean | null
+          operational_consent_date: string | null
+          ownership_status: string | null
           property_type: Database["public"]["Enums"]["property_type"]
+          seismic_rating: string | null
           tenant_id: string
           updated_at: string | null
           year_built: number | null
         }
         Insert: {
           address: string
+          asbestos_status?: string | null
+          contamination_status?: string | null
           created_at?: string | null
+          description?: string | null
           floor_area?: number | null
           id?: string
+          insurance_expiry_date?: string | null
+          insurance_status?: string | null
           name: string
+          notes?: string | null
+          oio_sensitive?: boolean | null
+          operational_consent_date?: string | null
+          ownership_status?: string | null
           property_type: Database["public"]["Enums"]["property_type"]
+          seismic_rating?: string | null
           tenant_id: string
           updated_at?: string | null
           year_built?: number | null
         }
         Update: {
           address?: string
+          asbestos_status?: string | null
+          contamination_status?: string | null
           created_at?: string | null
+          description?: string | null
           floor_area?: number | null
           id?: string
+          insurance_expiry_date?: string | null
+          insurance_status?: string | null
           name?: string
+          notes?: string | null
+          oio_sensitive?: boolean | null
+          operational_consent_date?: string | null
+          ownership_status?: string | null
           property_type?: Database["public"]["Enums"]["property_type"]
+          seismic_rating?: string | null
           tenant_id?: string
           updated_at?: string | null
           year_built?: number | null
@@ -443,6 +473,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "property_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_images: {
+        Row: {
+          file_path: string
+          id: string
+          property_id: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          file_path: string
+          id?: string
+          property_id: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          file_path?: string
+          id?: string
+          property_id?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_property"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "property_images_property_id_fkey"
             columns: ["property_id"]
             isOneToOne: false
             referencedRelation: "properties"
