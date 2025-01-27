@@ -135,9 +135,12 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       
       if (!user) throw new Error("No user found");
 
+      // Ensure all required fields are present and properly typed
       const propertyData = {
         ...data,
         tenant_id: user.id,
+        name: data.name || "",  // Ensure name is not undefined
+        address: data.address || "", // Ensure address is not undefined
         floor_area: data.floor_area ? parseFloat(data.floor_area) : null,
         site_area: data.site_area ? parseFloat(data.site_area) : null,
         year_built: data.year_built ? parseInt(data.year_built) : null,

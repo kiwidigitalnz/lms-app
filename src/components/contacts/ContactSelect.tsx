@@ -30,13 +30,13 @@ interface Contact {
   first_name: string;
   last_name: string | null;
   company: string | null;
-  contact_type: string;
+  contact_type: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
 }
 
 interface ContactSelectProps {
   value?: string;
   onChange: (value: string) => void;
-  contactType?: string;
+  contactType?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
   placeholder?: string;
 }
 
