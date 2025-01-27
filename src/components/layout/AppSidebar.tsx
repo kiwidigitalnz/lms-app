@@ -26,10 +26,32 @@ const menuItems = [
 export function AppSidebar() {
   const { signOut } = useAuth();
   const location = useLocation();
-  const { state } = useSidebar();
+  const { state, expandSidebar, collapseSidebar } = useSidebar();
+
+  const handleMouseEnter = () => {
+    if (!window.matchMedia('(hover: none)').matches) { // Only on devices with hover
+      expandSidebar();
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!window.matchMedia('(hover: none)').matches) { // Only on devices with hover
+      collapseSidebar();
+    }
+  };
+
+  const handleLinkClick = () => {
+    if (!window.matchMedia('(hover: none)').matches) { // Only on devices with hover
+      collapseSidebar();
+    }
+  };
 
   return (
-    <Sidebar className="h-screen">
+    <Sidebar 
+      className="h-screen" 
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <SidebarContent>
         <div className="relative h-full">
           <div className="absolute right-0 top-0 p-2 z-50">
@@ -47,6 +69,7 @@ export function AppSidebar() {
                       asChild 
                       isActive={location.pathname === item.url}
                       tooltip={state === "collapsed" ? item.title : undefined}
+                      onClick={handleLinkClick}
                     >
                       <Link to={item.url} className="flex items-center gap-3">
                         <item.icon className="h-4 w-4 shrink-0" />
@@ -62,7 +85,10 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="p-2 flex flex-col gap-2">
         <SidebarMenuButton 
-          onClick={signOut} 
+          onClick={() => {
+            handleLinkClick();
+            signOut();
+          }} 
           className="flex items-center gap-3 w-full text-left"
           tooltip={state === "collapsed" ? "Sign Out" : undefined}
         >

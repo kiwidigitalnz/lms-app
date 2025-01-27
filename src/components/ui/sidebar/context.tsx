@@ -11,6 +11,8 @@ type SidebarContext = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  expandSidebar: () => void
+  collapseSidebar: () => void
 }
 
 export const SidebarContext = React.createContext<SidebarContext | null>(null)
@@ -33,6 +35,14 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => (prev === "expanded" ? "collapsed" : "expanded"))
   }, [])
 
+  const expandSidebar = React.useCallback(() => {
+    setState("expanded")
+  }, [])
+
+  const collapseSidebar = React.useCallback(() => {
+    setState("collapsed")
+  }, [])
+
   const value = React.useMemo(
     () => ({
       state,
@@ -42,8 +52,10 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
       setOpenMobile,
       isMobile,
       toggleSidebar,
+      expandSidebar,
+      collapseSidebar,
     }),
-    [state, open, openMobile, isMobile, toggleSidebar]
+    [state, open, openMobile, isMobile, toggleSidebar, expandSidebar, collapseSidebar]
   )
 
   return (
