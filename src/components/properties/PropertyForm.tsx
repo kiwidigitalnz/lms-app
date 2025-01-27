@@ -59,10 +59,16 @@ const propertySchema = z.object({
   last_building_wof_date: z.string().optional(),
   next_building_wof_date: z.string().optional(),
   insurance_provider_contact_ids: z.array(z.string()).optional(),
+  insurance_broker_contact_ids: z.array(z.string()).optional(),
   insurance_policy_number: z.string().optional(),
   insurance_coverage_amount: z.number().optional(),
+  insurance_excess_amount: z.number().optional(),
+  insurance_liability_amount: z.number().optional(),
+  insurance_premium_amount: z.number().optional(),
   insurance_start_date: z.string().optional(),
   insurance_renewal_date: z.string().optional(),
+  insurance_renewal_reminder: z.boolean().optional(),
+  insurance_notes: z.string().optional(),
 });
 
 export type PropertyFormValues = z.infer<typeof propertySchema>;
@@ -114,10 +120,16 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       last_building_wof_date: "",
       next_building_wof_date: "",
       insurance_provider_contact_ids: [],
+      insurance_broker_contact_ids: [],
       insurance_policy_number: "",
       insurance_coverage_amount: undefined,
+      insurance_excess_amount: undefined,
+      insurance_liability_amount: undefined,
+      insurance_premium_amount: undefined,
       insurance_start_date: "",
       insurance_renewal_date: "",
+      insurance_renewal_reminder: false,
+      insurance_notes: "",
     },
   });
 
