@@ -303,85 +303,130 @@ export type Database = {
         Row: {
           address: string
           asbestos_status: string | null
+          building_class: string | null
+          building_height: number | null
+          building_management_system: boolean | null
+          construction_type: string | null
           contamination_status: string | null
           created_at: string | null
           description: string | null
+          elevator_count: number | null
+          energy_performance_rating: string | null
           floor_area: number | null
+          generator_backup: boolean | null
+          green_star_rating: number | null
+          hvac_system_type: string | null
           id: string
           insurance_coverage_amount: number | null
-          insurance_expiry_date: string | null
           insurance_notes: string | null
           insurance_policy_number: string | null
           insurance_provider: string | null
-          insurance_status: string | null
           landlord_contact_id: string | null
+          last_building_wof_date: string | null
+          nabersnz_rating: string | null
           name: string
+          net_lettable_area: number | null
+          next_building_wof_date: string | null
           notes: string | null
+          number_of_car_parks: number | null
+          number_of_floors: number | null
           oio_sensitive: boolean | null
           operational_consent_date: string | null
           ownership_status: string | null
           property_manager_contact_id: string | null
           property_type: Database["public"]["Enums"]["property_type"]
           seismic_rating: string | null
+          site_area: number | null
           site_contact_id: string | null
           tenant_id: string
           updated_at: string | null
+          waste_management_plan: boolean | null
           year_built: number | null
         }
         Insert: {
           address: string
           asbestos_status?: string | null
+          building_class?: string | null
+          building_height?: number | null
+          building_management_system?: boolean | null
+          construction_type?: string | null
           contamination_status?: string | null
           created_at?: string | null
           description?: string | null
+          elevator_count?: number | null
+          energy_performance_rating?: string | null
           floor_area?: number | null
+          generator_backup?: boolean | null
+          green_star_rating?: number | null
+          hvac_system_type?: string | null
           id?: string
           insurance_coverage_amount?: number | null
-          insurance_expiry_date?: string | null
           insurance_notes?: string | null
           insurance_policy_number?: string | null
           insurance_provider?: string | null
-          insurance_status?: string | null
           landlord_contact_id?: string | null
+          last_building_wof_date?: string | null
+          nabersnz_rating?: string | null
           name: string
+          net_lettable_area?: number | null
+          next_building_wof_date?: string | null
           notes?: string | null
+          number_of_car_parks?: number | null
+          number_of_floors?: number | null
           oio_sensitive?: boolean | null
           operational_consent_date?: string | null
           ownership_status?: string | null
           property_manager_contact_id?: string | null
           property_type: Database["public"]["Enums"]["property_type"]
           seismic_rating?: string | null
+          site_area?: number | null
           site_contact_id?: string | null
           tenant_id: string
           updated_at?: string | null
+          waste_management_plan?: boolean | null
           year_built?: number | null
         }
         Update: {
           address?: string
           asbestos_status?: string | null
+          building_class?: string | null
+          building_height?: number | null
+          building_management_system?: boolean | null
+          construction_type?: string | null
           contamination_status?: string | null
           created_at?: string | null
           description?: string | null
+          elevator_count?: number | null
+          energy_performance_rating?: string | null
           floor_area?: number | null
+          generator_backup?: boolean | null
+          green_star_rating?: number | null
+          hvac_system_type?: string | null
           id?: string
           insurance_coverage_amount?: number | null
-          insurance_expiry_date?: string | null
           insurance_notes?: string | null
           insurance_policy_number?: string | null
           insurance_provider?: string | null
-          insurance_status?: string | null
           landlord_contact_id?: string | null
+          last_building_wof_date?: string | null
+          nabersnz_rating?: string | null
           name?: string
+          net_lettable_area?: number | null
+          next_building_wof_date?: string | null
           notes?: string | null
+          number_of_car_parks?: number | null
+          number_of_floors?: number | null
           oio_sensitive?: boolean | null
           operational_consent_date?: string | null
           ownership_status?: string | null
           property_manager_contact_id?: string | null
           property_type?: Database["public"]["Enums"]["property_type"]
           seismic_rating?: string | null
+          site_area?: number | null
           site_contact_id?: string | null
           tenant_id?: string
           updated_at?: string | null
+          waste_management_plan?: boolean | null
           year_built?: number | null
         }
         Relationships: [

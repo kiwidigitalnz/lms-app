@@ -18,6 +18,8 @@ import { BasicInfoTab } from "./form/BasicInfoTab";
 import { DetailsTab } from "./form/DetailsTab";
 import { ComplianceTab } from "./form/ComplianceTab";
 import { InsuranceTab } from "./form/InsuranceTab";
+import { EnvironmentalTab } from "./form/EnvironmentalTab";
+import { TechnicalTab } from "./form/TechnicalTab";
 import { ImageUpload } from "./ImageUpload";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -33,11 +35,16 @@ const propertySchema = z.object({
   address: z.string().min(1, "Address is required"),
   property_type: z.enum(["commercial", "industrial"]),
   floor_area: z.string().optional(),
+  site_area: z.string().optional(),
+  number_of_floors: z.number().optional(),
+  number_of_car_parks: z.number().optional(),
+  building_class: z.enum(["A", "B", "C"]).optional(),
+  construction_type: z.string().optional(),
+  building_height: z.number().optional(),
+  net_lettable_area: z.number().optional(),
   year_built: z.string().optional(),
   description: z.string().optional(),
   ownership_status: z.enum(["owned", "leased", "managed"]),
-  insurance_status: z.string().optional(),
-  insurance_expiry_date: z.string().optional(),
   seismic_rating: z.enum(["A/A+", "B", "C", "D", "NA"]),
   asbestos_status: z.enum(["present", "not_present", "unknown"]),
   contamination_status: z.enum(["yes", "no", "unknown"]),
@@ -47,10 +54,16 @@ const propertySchema = z.object({
   landlord_contact_id: z.string().optional(),
   property_manager_contact_id: z.string().optional(),
   site_contact_id: z.string().optional(),
-  insurance_provider: z.string().optional(),
-  insurance_policy_number: z.string().optional(),
-  insurance_coverage_amount: z.number().optional(),
-  insurance_notes: z.string().optional(),
+  nabersnz_rating: z.string().optional(),
+  green_star_rating: z.number().min(0).max(6).optional(),
+  energy_performance_rating: z.string().optional(),
+  waste_management_plan: z.boolean().optional(),
+  hvac_system_type: z.string().optional(),
+  building_management_system: z.boolean().optional(),
+  generator_backup: z.boolean().optional(),
+  elevator_count: z.number().optional(),
+  last_building_wof_date: z.string().optional(),
+  next_building_wof_date: z.string().optional(),
 });
 
 export type PropertyFormValues = z.infer<typeof propertySchema>;
@@ -85,11 +98,16 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       address: "",
       property_type: "commercial",
       floor_area: "",
+      site_area: "",
+      number_of_floors: undefined,
+      number_of_car_parks: undefined,
+      building_class: undefined,
+      construction_type: "",
+      building_height: undefined,
+      net_lettable_area: undefined,
       year_built: "",
       description: "",
       ownership_status: "owned",
-      insurance_status: "",
-      insurance_expiry_date: "",
       seismic_rating: "NA",
       asbestos_status: "unknown",
       contamination_status: "unknown",
@@ -99,10 +117,16 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       landlord_contact_id: "",
       property_manager_contact_id: "",
       site_contact_id: "",
-      insurance_provider: "",
-      insurance_policy_number: "",
-      insurance_coverage_amount: undefined,
-      insurance_notes: "",
+      nabersnz_rating: "",
+      green_star_rating: undefined,
+      energy_performance_rating: "",
+      waste_management_plan: false,
+      hvac_system_type: "",
+      building_management_system: false,
+      generator_backup: false,
+      elevator_count: undefined,
+      last_building_wof_date: "",
+      next_building_wof_date: "",
     },
   });
 
@@ -113,29 +137,10 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
       if (!user) throw new Error("No user found");
 
       const propertyData = {
-        name: data.name,
-        address: data.address,
-        property_type: data.property_type,
+        ...data,
+        tenant_id: user.id,
         floor_area: data.floor_area ? parseFloat(data.floor_area) : null,
         year_built: data.year_built ? parseInt(data.year_built) : null,
-        description: data.description,
-        ownership_status: data.ownership_status,
-        insurance_status: data.insurance_status,
-        insurance_expiry_date: data.insurance_expiry_date,
-        seismic_rating: data.seismic_rating,
-        asbestos_status: data.asbestos_status,
-        contamination_status: data.contamination_status,
-        oio_sensitive: data.oio_sensitive,
-        operational_consent_date: data.operational_consent_date,
-        notes: data.notes,
-        tenant_id: user.id,
-        landlord_contact_id: data.landlord_contact_id || null,
-        property_manager_contact_id: data.property_manager_contact_id || null,
-        site_contact_id: data.site_contact_id || null,
-        insurance_provider: data.insurance_provider,
-        insurance_policy_number: data.insurance_policy_number,
-        insurance_coverage_amount: data.insurance_coverage_amount,
-        insurance_notes: data.insurance_notes,
       };
 
       if (mode === "create") {
@@ -179,11 +184,13 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="compliance">Compliance</TabsTrigger>
             <TabsTrigger value="insurance">Insurance</TabsTrigger>
+            <TabsTrigger value="environmental">Environmental</TabsTrigger>
+            <TabsTrigger value="technical">Technical</TabsTrigger>
             <TabsTrigger value="contacts">Contacts</TabsTrigger>
           </TabsList>
           
@@ -201,6 +208,14 @@ export function PropertyForm({ onSuccess, initialData, mode = "create" }: Proper
 
           <TabsContent value="insurance" className="space-y-4 mt-4">
             <InsuranceTab form={form} />
+          </TabsContent>
+
+          <TabsContent value="environmental" className="space-y-4 mt-4">
+            <EnvironmentalTab form={form} />
+          </TabsContent>
+
+          <TabsContent value="technical" className="space-y-4 mt-4">
+            <TechnicalTab form={form} />
           </TabsContent>
 
           <TabsContent value="contacts" className="space-y-4 mt-4">
