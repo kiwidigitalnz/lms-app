@@ -7,9 +7,9 @@ import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { SidebarContext, useSidebar } from "./context"
 
-const SIDEBAR_WIDTH = "18rem" // Increased from 16rem
-const SIDEBAR_WIDTH_ICON = "4rem" // Increased from 3.5rem
-const SIDEBAR_WIDTH_MOBILE = "20rem" // Increased from 18rem
+const SIDEBAR_WIDTH = "16rem" // Decreased from 18rem
+const SIDEBAR_WIDTH_ICON = "4rem" // Keep at 4rem for better icon visibility
+const SIDEBAR_WIDTH_MOBILE = "18rem" // Decreased from 20rem
 
 export const Sidebar = React.forwardRef<
   HTMLDivElement,
@@ -72,7 +72,7 @@ export const Sidebar = React.forwardRef<
         ref={ref}
         className={cn(
           "group relative h-full bg-sidebar text-sidebar-foreground transition-[width] duration-300 ease-in-out shadow-lg",
-          state === "expanded" ? "w-72" : "w-16",
+          state === "expanded" ? "w-64" : "w-16",
           className
         )}
         data-state={state}

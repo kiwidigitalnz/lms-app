@@ -29,19 +29,19 @@ export function AppSidebar() {
   const { state, expandSidebar, collapseSidebar } = useSidebar();
 
   const handleMouseEnter = () => {
-    if (!window.matchMedia('(hover: none)').matches) { // Only on devices with hover
+    if (!window.matchMedia('(hover: none)').matches) {
       expandSidebar();
     }
   };
 
   const handleMouseLeave = () => {
-    if (!window.matchMedia('(hover: none)').matches) { // Only on devices with hover
+    if (!window.matchMedia('(hover: none)').matches) {
       collapseSidebar();
     }
   };
 
   const handleLinkClick = () => {
-    if (!window.matchMedia('(hover: none)').matches) { // Only on devices with hover
+    if (!window.matchMedia('(hover: none)').matches) {
       collapseSidebar();
     }
   };
@@ -72,7 +72,7 @@ export function AppSidebar() {
                       onClick={handleLinkClick}
                     >
                       <Link to={item.url} className="flex items-center gap-3">
-                        <item.icon className="h-4 w-4 shrink-0" />
+                        <item.icon className="h-5 w-5 shrink-0" />
                         <span className={state === "collapsed" ? "hidden" : ""}>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -92,7 +92,7 @@ export function AppSidebar() {
           className="flex items-center gap-3 w-full text-left"
           tooltip={state === "collapsed" ? "Sign Out" : undefined}
         >
-          <LogOut className="h-4 w-4 shrink-0" />
+          <LogOut className="h-5 w-5 shrink-0" />
           <span className={state === "collapsed" ? "hidden" : ""}>Sign Out</span>
         </SidebarMenuButton>
       </SidebarFooter>
