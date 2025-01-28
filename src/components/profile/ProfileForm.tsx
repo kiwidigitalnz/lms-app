@@ -28,6 +28,8 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+    
     setIsSubmitting(true);
 
     try {
@@ -41,17 +43,18 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
           mobile: formData.mobile,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user?.id)
-        .select();
+        .eq('id', user.id)
+        .select()
+        .single();
 
       if (error) throw error;
 
-      if (!data || data.length === 0) {
+      if (!data) {
         throw new Error('No data returned from update operation');
       }
 
-      // Invalidate and refetch profile data
-      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      // Ensure the query is properly invalidated
+      await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
       
       toast({
         title: "Success",

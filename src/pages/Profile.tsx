@@ -24,7 +24,15 @@ const Profile = () => {
         .eq("id", user?.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching profile:", error);
+        throw error;
+      }
+      
+      if (!data) {
+        throw new Error("Profile not found");
+      }
+
       return data;
     },
     enabled: !!user,
@@ -55,7 +63,6 @@ const Profile = () => {
       description="Manage your profile settings"
     >
       <div className="max-w-3xl mx-auto space-y-8">
-        {/* Profile Card */}
         <Card className="overflow-hidden">
           <ProfileHeader 
             firstName={profile?.first_name || ""}
@@ -102,7 +109,6 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Security Card */}
         <Card>
           <CardContent className="pt-6">
             <SecuritySection />
