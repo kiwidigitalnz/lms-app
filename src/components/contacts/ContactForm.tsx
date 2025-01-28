@@ -18,9 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 const contactSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -42,7 +43,6 @@ interface ContactFormProps {
 }
 
 export function ContactForm({ onSuccess, initialData, mode = "create" }: ContactFormProps) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<ContactFormValues>({
@@ -63,14 +63,17 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) throw new Error("No user found");
+      if (!user) {
+        toast({
+          variant: "destructive",
+          description: "You must be logged in to create contacts",
+        });
+        return;
+      }
 
-      // Ensure all required fields are present and properly typed
       const contactData = {
         ...data,
         tenant_id: user.id,
-        first_name: data.first_name, // Required field
-        contact_type: data.contact_type, // Required field
       };
 
       if (mode === "create") {
@@ -81,7 +84,6 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
         if (error) throw error;
 
         toast({
-          title: "Success",
           description: "Contact added successfully",
         });
       } else {
@@ -93,7 +95,6 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
         if (error) throw error;
 
         toast({
-          title: "Success",
           description: "Contact updated successfully",
         });
       }
@@ -103,9 +104,8 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
     } catch (error) {
       console.error("Error saving contact:", error);
       toast({
-        title: "Error",
-        description: "Failed to save contact",
         variant: "destructive",
+        description: "Failed to save contact",
       });
     }
   };
@@ -226,8 +226,19 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
           )}
         />
 
-        <Button type="submit">
-          {mode === "create" ? "Add Contact" : "Update Contact"}
+        <Button 
+          type="submit" 
+          disabled={form.formState.isSubmitting}
+          className="w-full"
+        >
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {mode === "create" ? "Adding Contact..." : "Updating Contact..."}
+            </>
+          ) : (
+            mode === "create" ? "Add Contact" : "Update Contact"
+          )}
         </Button>
       </form>
     </Form>

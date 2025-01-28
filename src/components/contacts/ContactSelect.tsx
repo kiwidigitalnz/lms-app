@@ -51,7 +51,7 @@ export function ContactSelect({
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       let query = supabase
@@ -82,12 +82,19 @@ export function ContactSelect({
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
     onChange(newValue);
-    setOpen(false);
   };
 
   const removeContact = (contactId: string) => {
     onChange(value.filter(id => id !== contactId));
   };
+
+  if (isError) {
+    return (
+      <div className="text-sm text-destructive">
+        Error loading contacts. Please try again.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
@@ -129,7 +136,10 @@ export function ContactSelect({
                   <CommandEmpty className="py-6 text-center text-sm">
                     No contacts found.
                     <div className="mt-2">
-                      <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)}>
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setOpen(false);
+                        setIsCreateOpen(true);
+                      }}>
                         <Plus className="mr-2 h-4 w-4" />
                         Create New Contact
                       </Button>
