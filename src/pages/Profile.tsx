@@ -74,7 +74,6 @@ const Profile = () => {
                   company: profile?.company || "",
                   job_title: profile?.job_title || "",
                   mobile: profile?.mobile || "",
-                  email: profile?.email || "",
                 }}
                 onCancel={() => setIsEditing(false)}
               />
