@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -73,13 +73,13 @@ export function ContactSelect({
   };
 
   const handleCreateSuccess = async () => {
-    await refetch();
     setShowCreateDialog(false);
+    await refetch();
   };
 
   const handleCreateNew = () => {
-    setOpen(false); // Close the popover
-    setShowCreateDialog(true); // Open the create dialog
+    setOpen(false);
+    setShowCreateDialog(true);
   };
 
   return (

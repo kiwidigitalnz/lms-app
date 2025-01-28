@@ -51,6 +51,14 @@ export function ContactSelectList({
            company.includes(searchTerm);
   });
 
+  const handleSelect = (value: string) => {
+    if (value === "create-new") {
+      onCreateNew();
+    } else {
+      onSelect(value);
+    }
+  };
+
   return (
     <Command shouldFilter={false}>
       <CommandInput 
@@ -65,7 +73,11 @@ export function ContactSelectList({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={onCreateNew}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onCreateNew();
+              }}
             >
               <Plus className="mr-2 h-4 w-4" />
               Create New Contact
@@ -76,7 +88,8 @@ export function ContactSelectList({
           {filteredContacts.map((contact) => (
             <CommandItem
               key={contact.id}
-              onSelect={() => onSelect(contact.id)}
+              value={contact.id}
+              onSelect={handleSelect}
               className="cursor-pointer"
             >
               <Check
@@ -90,7 +103,8 @@ export function ContactSelectList({
           ))}
           {filteredContacts.length > 0 && (
             <CommandItem
-              onSelect={onCreateNew}
+              value="create-new"
+              onSelect={handleSelect}
               className="cursor-pointer border-t"
             >
               <Plus className="mr-2 h-4 w-4" />
