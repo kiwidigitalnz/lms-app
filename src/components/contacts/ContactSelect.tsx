@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ContactForm } from "./ContactForm";
 import { useQuery } from "@tanstack/react-query";
@@ -72,7 +71,7 @@ export function ContactSelect({
       console.log("Fetched contacts:", contacts);
       return contacts as Contact[];
     },
-    enabled: open,
+    enabled: open, // Only fetch when the popover is open
   });
 
   const contacts = data || [];
@@ -84,7 +83,6 @@ export function ContactSelect({
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
     onChange(newValue);
-    setOpen(false);
   };
 
   const removeContact = (contactId: string) => {
@@ -94,7 +92,6 @@ export function ContactSelect({
   const handleCreateClick = () => {
     console.log("Opening create dialog");
     setIsCreateOpen(true);
-    setOpen(false);
   };
 
   return (
@@ -139,11 +136,9 @@ export function ContactSelect({
         </Popover>
 
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="icon" className="shrink-0">
-              <Plus className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
+          <Button variant="outline" size="icon" className="shrink-0" onClick={handleCreateClick}>
+            <Plus className="h-4 w-4" />
+          </Button>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Contact</DialogTitle>
@@ -153,7 +148,7 @@ export function ContactSelect({
                 setIsCreateOpen(false);
                 refetch();
               }}
-              defaultContactType={contactType}
+              contact_type={contactType}
             />
           </DialogContent>
         </Dialog>

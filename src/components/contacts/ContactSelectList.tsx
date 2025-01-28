@@ -43,6 +43,7 @@ export function ContactSelectList({
     return contact.company ? `${name} (${contact.company})` : name;
   };
 
+  // Filter contacts based on search term
   const filteredContacts = contacts.filter(contact => {
     const search = searchTerm.toLowerCase();
     const firstName = contact.first_name.toLowerCase();
@@ -55,7 +56,7 @@ export function ContactSelectList({
   });
 
   return (
-    <Command>
+    <Command shouldFilter={false}> {/* Disable built-in filtering as we handle it manually */}
       <CommandInput 
         placeholder="Search contacts..." 
         value={searchTerm}
@@ -87,20 +88,24 @@ export function ContactSelectList({
           </CommandEmpty>
         ) : (
           <CommandGroup>
-            {filteredContacts.map((contact) => (
-              <CommandItem
-                key={contact.id}
-                onSelect={() => onSelect(contact.id)}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    selectedIds.includes(contact.id) ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {getContactLabel(contact)}
-              </CommandItem>
-            ))}
+            {filteredContacts.map((contact) => {
+              const label = getContactLabel(contact);
+              return (
+                <CommandItem
+                  key={contact.id}
+                  onSelect={() => onSelect(contact.id)}
+                  className="cursor-pointer"
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedIds.includes(contact.id) ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {label}
+                </CommandItem>
+              );
+            })}
           </CommandGroup>
         )}
       </CommandList>

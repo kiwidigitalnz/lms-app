@@ -40,9 +40,15 @@ interface ContactFormProps {
   onSuccess?: () => void;
   initialData?: any;
   mode?: "create" | "edit";
+  contact_type?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
 }
 
-export function ContactForm({ onSuccess, initialData, mode = "create" }: ContactFormProps) {
+export function ContactForm({ 
+  onSuccess, 
+  initialData, 
+  mode = "create",
+  contact_type 
+}: ContactFormProps) {
   const queryClient = useQueryClient();
 
   const form = useForm<ContactFormValues>({
@@ -54,7 +60,7 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
       email: "",
       phone: "",
       mobile: "",
-      contact_type: "other" as const,
+      contact_type: contact_type || "other" as const,
       notes: "",
     },
   });
