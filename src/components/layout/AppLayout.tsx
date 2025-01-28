@@ -48,13 +48,13 @@ export function AppLayout({ children, title, description }: AppLayoutProps) {
                 )}
               </div>
               <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground hidden sm:inline-block">
+                  {displayName}
+                </span>
                 <div className="flex items-center gap-2">
                   <UserMenu />
-                  <span className="text-sm text-muted-foreground hidden sm:inline-block">
-                    {displayName}
-                  </span>
+                  <NotificationList />
                 </div>
-                <NotificationList />
               </div>
             </div>
             {children}
