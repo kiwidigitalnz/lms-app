@@ -10,6 +10,8 @@ interface ProfileFormData {
   first_name: string;
   last_name: string;
   company: string;
+  job_title: string;
+  mobile: string;
 }
 
 interface ProfileFormProps {
@@ -70,6 +72,21 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         <Input
           value={formData.company}
           onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+        />
+      </div>
+      <div className="grid gap-1">
+        <label className="text-sm font-medium">Job Title</label>
+        <Input
+          value={formData.job_title}
+          onChange={(e) => setFormData(prev => ({ ...prev, job_title: e.target.value }))}
+        />
+      </div>
+      <div className="grid gap-1">
+        <label className="text-sm font-medium">Mobile</label>
+        <Input
+          value={formData.mobile}
+          onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+          type="tel"
         />
       </div>
       <div className="flex gap-2">

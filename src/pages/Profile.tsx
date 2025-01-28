@@ -1,7 +1,7 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Shield, Building2, Mail, Clock } from "lucide-react";
+import { User, Shield, Building2, Mail, Clock, Briefcase, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,6 +75,8 @@ const Profile = () => {
                   first_name: profile?.first_name || "",
                   last_name: profile?.last_name || "",
                   company: profile?.company || "",
+                  job_title: profile?.job_title || "",
+                  mobile: profile?.mobile || "",
                 }}
                 onCancel={() => setIsEditing(false)}
               />
@@ -84,7 +86,11 @@ const Profile = () => {
                   <h2 className="text-2xl font-semibold">
                     {profile?.first_name} {profile?.last_name}
                   </h2>
-                  <p className="text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                    <Briefcase className="h-4 w-4" />
+                    <span>{profile?.job_title || "No job title set"}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {profile?.company || "No company set"}
                   </p>
                 </div>
@@ -95,6 +101,11 @@ const Profile = () => {
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">{user?.email}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">{profile?.mobile || "No mobile number set"}</span>
                   </div>
 
                   <div className="flex items-center gap-2">

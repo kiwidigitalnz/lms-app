@@ -274,7 +274,9 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          job_title: string | null
           last_name: string | null
+          mobile: string | null
           updated_at: string
         }
         Insert: {
@@ -284,7 +286,9 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
+          job_title?: string | null
           last_name?: string | null
+          mobile?: string | null
           updated_at?: string
         }
         Update: {
@@ -294,7 +298,9 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          job_title?: string | null
           last_name?: string | null
+          mobile?: string | null
           updated_at?: string
         }
         Relationships: []
