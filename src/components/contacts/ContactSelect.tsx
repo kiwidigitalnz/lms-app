@@ -45,14 +45,13 @@ interface ContactSelectProps {
 export function ContactSelect({ 
   value = [], 
   onChange, 
-  contactType,
   placeholder = "Select contact..."
 }: ContactSelectProps) {
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["contacts", contactType],
+    queryKey: ["contacts"],
     queryFn: async () => {
       console.log("Fetching contacts...");
       const { data: { user } } = await supabase.auth.getUser();
@@ -60,17 +59,10 @@ export function ContactSelect({
       
       if (!user) throw new Error("No user found");
 
-      let query = supabase
+      const { data: contacts, error } = await supabase
         .from("contacts")
         .select("id, first_name, last_name, company, contact_type")
         .eq("tenant_id", user.id);
-
-      if (contactType) {
-        console.log("Filtering by contact type:", contactType);
-        query = query.eq("contact_type", contactType);
-      }
-
-      const { data: contacts, error } = await query;
       
       if (error) {
         console.error("Error fetching contacts:", error);
@@ -201,7 +193,6 @@ export function ContactSelect({
                 setIsCreateOpen(false);
                 refetch();
               }}
-              initialData={contactType ? { contact_type: contactType } : undefined}
             />
           </DialogContent>
         </Dialog>
