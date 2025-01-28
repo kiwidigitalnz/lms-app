@@ -90,6 +90,7 @@ export function ContactSelect({
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
     onChange(newValue);
+    setOpen(false);
   };
 
   const removeContact = (contactId: string) => {
@@ -99,6 +100,7 @@ export function ContactSelect({
   const handleCreateClick = () => {
     console.log("Opening create dialog");
     setIsCreateOpen(true);
+    setOpen(false);
   };
 
   const filteredContacts = contacts.filter(contact => {
@@ -139,7 +141,7 @@ export function ContactSelect({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[400px] p-0">
+          <PopoverContent className="w-[400px] p-0" align="start">
             <Command>
               <CommandInput 
                 placeholder="Search contacts..." 
@@ -175,7 +177,6 @@ export function ContactSelect({
                     {filteredContacts.map((contact) => (
                       <CommandItem
                         key={contact.id}
-                        value={getContactLabel(contact)}
                         onSelect={() => handleSelect(contact.id)}
                       >
                         <Check
@@ -200,7 +201,7 @@ export function ContactSelect({
               <Plus className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Contact</DialogTitle>
             </DialogHeader>
