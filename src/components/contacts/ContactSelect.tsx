@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronsUpDown, Loader2, Plus } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -39,17 +39,12 @@ export function ContactSelect({
   placeholder = "Select contact...",
   contactType
 }: ContactSelectProps) {
-  const [open, setOpen] = useState(false);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data: contacts = [], refetch } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
-      console.log("Fetching contacts...");
       const { data: { user } } = await supabase.auth.getUser();
-      console.log("Current user:", user);
-      
       if (!user) throw new Error("No user found");
 
       let query = supabase
@@ -61,66 +56,37 @@ export function ContactSelect({
         query = query.eq("contact_type", contactType);
       }
 
-      const { data: contacts, error } = await query;
-      
-      if (error) {
-        console.error("Error fetching contacts:", error);
-        throw error;
-      }
-
-      console.log("Fetched contacts:", contacts);
-      return contacts as Contact[];
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as Contact[];
     },
-    enabled: open, // Only fetch when the popover is open
   });
 
-  const contacts = data || [];
   const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
 
   const handleSelect = (contactId: string) => {
-    console.log("Selecting contact:", contactId);
     const newValue = value.includes(contactId)
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
     onChange(newValue);
-    // Don't close the popover to allow multiple selections
-  };
-
-  const removeContact = (contactId: string) => {
-    onChange(value.filter(id => id !== contactId));
-  };
-
-  const handleCreateClick = () => {
-    console.log("Opening create dialog");
-    setIsCreateOpen(true);
-    // Don't close the popover, let the user decide when to close it
   };
 
   const handleCreateSuccess = () => {
-    setIsCreateOpen(false);
-    refetch().then(() => {
-      console.log("Contacts refetched after creation");
-    });
+    refetch();
   };
 
   return (
     <div className="space-y-2">
       <div className="flex gap-2">
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               role="combobox"
-              aria-expanded={open}
+              aria-expanded={isOpen}
               className="w-full justify-between"
-              disabled={isLoading}
             >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
-                </div>
-              ) : selectedContacts.length > 0 ? (
+              {selectedContacts.length > 0 ? (
                 <span className="truncate">
                   {`${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'} selected`}
                 </span>
@@ -134,36 +100,18 @@ export function ContactSelect({
             <ContactSelectList
               contacts={contacts}
               selectedIds={value}
-              isLoading={isLoading}
-              error={error as Error}
-              searchTerm={search}
-              onSearchChange={setSearch}
               onSelect={handleSelect}
-              onCreateClick={handleCreateClick}
+              onCreateSuccess={handleCreateSuccess}
+              contactType={contactType}
             />
           </PopoverContent>
         </Popover>
-
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <Button variant="outline" size="icon" className="shrink-0" onClick={handleCreateClick}>
-            <Plus className="h-4 w-4" />
-          </Button>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Contact</DialogTitle>
-            </DialogHeader>
-            <ContactForm 
-              onSuccess={handleCreateSuccess}
-              contact_type={contactType}
-            />
-          </DialogContent>
-        </Dialog>
       </div>
 
       {selectedContacts.length > 0 && (
         <SelectedContacts
           contacts={selectedContacts}
-          onRemove={removeContact}
+          onRemove={handleSelect}
         />
       )}
     </div>
