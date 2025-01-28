@@ -22,7 +22,7 @@ const Profile = () => {
     queryFn: async () => {
       if (!user?.id) throw new Error("No user ID available");
 
-      console.log("Fetching profile for user:", user.id); // Debug log
+      console.log("Fetching profile for user:", user.id);
 
       const { data, error } = await supabase
         .from("profiles")
@@ -34,12 +34,12 @@ const Profile = () => {
         console.error("Error fetching profile:", error);
         throw error;
       }
-      
+
       if (!data) {
         throw new Error("Profile not found");
       }
 
-      console.log("Profile data fetched:", data); // Debug log
+      console.log("Profile data fetched:", data);
       return data;
     },
     enabled: !!user?.id,
@@ -66,7 +66,7 @@ const Profile = () => {
       return data;
     },
     enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 1000 * 60 * 5,
     retry: 2,
   });
 

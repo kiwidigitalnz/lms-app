@@ -23,7 +23,7 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(initialData);
+  const [formData, setFormData] = useState<ProfileFormData>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,25 +38,30 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
     }
     
     setIsSubmitting(true);
-    console.log("Submitting profile update:", formData); // Debug log
+    console.log("Starting profile update with data:", formData);
 
     try {
+      // Prepare update data with trimmed values
+      const updateData = {
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        company: formData.company.trim(),
+        job_title: formData.job_title.trim(),
+        mobile: formData.mobile.trim(),
+        updated_at: new Date().toISOString(),
+      };
+
+      console.log("Sending update to Supabase:", updateData);
+
       const { error, data } = await supabase
         .from('profiles')
-        .update({
-          first_name: formData.first_name.trim(),
-          last_name: formData.last_name.trim(),
-          company: formData.company.trim(),
-          job_title: formData.job_title.trim(),
-          mobile: formData.mobile.trim(),
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', user.id)
         .select('*')
         .single();
 
       if (error) {
-        console.error("Supabase error:", error); // Debug log
+        console.error("Supabase update error:", error);
         throw error;
       }
 
@@ -64,9 +69,9 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         throw new Error('No data returned from update operation');
       }
 
-      console.log("Profile updated successfully:", data); // Debug log
+      console.log("Profile updated successfully:", data);
 
-      // Force an immediate refetch of the profile data
+      // Immediately invalidate and refetch profile data
       await queryClient.invalidateQueries({ 
         queryKey: ["profile", user.id],
         exact: true,
