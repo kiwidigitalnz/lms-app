@@ -54,9 +54,13 @@ export function ContactSelect({
   const { data, isLoading, isError } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       let query = supabase
         .from("contacts")
         .select("id, first_name, last_name, company, contact_type")
+        .eq("tenant_id", user.id)
         .order("first_name", { ascending: true });
 
       if (contactType) {
@@ -68,6 +72,8 @@ export function ContactSelect({
       return (data || []) as Contact[];
     },
   });
+
+  // ... keep existing code (getContactLabel, handleSelect, removeContact functions)
 
   const contacts = data || [];
   const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
