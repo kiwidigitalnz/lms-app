@@ -1,6 +1,13 @@
 import { useState } from "react";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Check, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
@@ -15,7 +22,6 @@ import {
 import { ContactForm } from "./ContactForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ContactSelectList } from "./ContactSelectList";
 
 interface Contact {
   id: string;
@@ -36,10 +42,11 @@ export function ContactSelect({
   value, 
   onChange, 
   placeholder = "Search contacts...",
-  contactType
+  contactType 
 }: ContactSelectProps) {
   const [open, setOpen] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [search, setSearch] = useState("");
 
   const { data: contacts = [], refetch } = useQuery({
     queryKey: ["contacts", contactType],
@@ -62,26 +69,37 @@ export function ContactSelect({
     },
   });
 
+  const filteredContacts = contacts.filter(contact => {
+    const searchTerm = search.toLowerCase();
+    const firstName = contact.first_name.toLowerCase();
+    const lastName = (contact.last_name || "").toLowerCase();
+    const company = (contact.company || "").toLowerCase();
+    
+    return firstName.includes(searchTerm) || 
+           lastName.includes(searchTerm) || 
+           company.includes(searchTerm);
+  });
+
   const selectedContact = contacts.find((contact) => contact.id === value);
 
+  const getContactLabel = (contact: Contact) => {
+    const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
+    return contact.company ? `${name} (${contact.company})` : name;
+  };
+
   const handleSelect = (contactId: string) => {
-    onChange(contactId);
-    setOpen(false);
+    if (contactId === "create-new") {
+      setShowCreateDialog(true);
+      setOpen(false);
+    } else {
+      onChange(contactId);
+      setOpen(false);
+    }
   };
 
   const handleCreateSuccess = async () => {
     setShowCreateDialog(false);
     await refetch();
-  };
-
-  const handleCreateNew = () => {
-    setOpen(false);
-    setShowCreateDialog(true);
-  };
-
-  const getContactLabel = (contact: Contact) => {
-    const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
-    return contact.company ? `${name} (${contact.company})` : name;
   };
 
   return (
@@ -105,13 +123,49 @@ export function ContactSelect({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0" align="start">
-          <ContactSelectList
-            contacts={contacts}
-            selectedIds={value ? [value] : []}
-            onSelect={handleSelect}
-            onCreateNew={handleCreateNew}
-            contactType={contactType}
-          />
+          <Command shouldFilter={false}>
+            <CommandInput 
+              placeholder="Search contacts..." 
+              value={search}
+              onValueChange={setSearch}
+            />
+            <CommandGroup>
+              {filteredContacts.map((contact) => (
+                <CommandItem
+                  key={contact.id}
+                  onSelect={() => handleSelect(contact.id)}
+                  className="cursor-pointer"
+                >
+                  <Check
+                    className={`mr-2 h-4 w-4 ${
+                      contact.id === value ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                  {getContactLabel(contact)}
+                </CommandItem>
+              ))}
+              <CommandItem
+                onSelect={() => handleSelect("create-new")}
+                className="cursor-pointer border-t"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create New Contact
+              </CommandItem>
+            </CommandGroup>
+            <CommandEmpty className="py-6 text-center text-sm">
+              No contacts found.
+              <div className="mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleSelect("create-new")}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Contact
+                </Button>
+              </div>
+            </CommandEmpty>
+          </Command>
         </PopoverContent>
       </Popover>
 

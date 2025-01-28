@@ -28,12 +28,31 @@ export function ContactsTab({ form }: ContactsTabProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Landlords</FormLabel>
-            <ContactSelect
-              value=""
-              onChange={handleContactChange('landlord_contact_ids')}
-              contactType="landlord"
-              placeholder="Select landlord..."
-            />
+            <div className="space-y-2">
+              {(field.value || []).map((contactId: string) => (
+                <ContactSelect
+                  key={contactId}
+                  value={contactId}
+                  onChange={(newValue) => {
+                    const values = field.value || [];
+                    const index = values.indexOf(contactId);
+                    if (index !== -1) {
+                      const newValues = [...values];
+                      newValues[index] = newValue;
+                      field.onChange(newValues);
+                    }
+                  }}
+                  contactType="landlord"
+                  placeholder="Select landlord..."
+                />
+              ))}
+              <ContactSelect
+                value=""
+                onChange={handleContactChange('landlord_contact_ids')}
+                contactType="landlord"
+                placeholder="Add landlord..."
+              />
+            </div>
             <FormMessage />
           </FormItem>
         )}
@@ -45,12 +64,31 @@ export function ContactsTab({ form }: ContactsTabProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Property Managers</FormLabel>
-            <ContactSelect
-              value=""
-              onChange={handleContactChange('property_manager_contact_ids')}
-              contactType="property_manager"
-              placeholder="Select property manager..."
-            />
+            <div className="space-y-2">
+              {(field.value || []).map((contactId: string) => (
+                <ContactSelect
+                  key={contactId}
+                  value={contactId}
+                  onChange={(newValue) => {
+                    const values = field.value || [];
+                    const index = values.indexOf(contactId);
+                    if (index !== -1) {
+                      const newValues = [...values];
+                      newValues[index] = newValue;
+                      field.onChange(newValues);
+                    }
+                  }}
+                  contactType="property_manager"
+                  placeholder="Select property manager..."
+                />
+              ))}
+              <ContactSelect
+                value=""
+                onChange={handleContactChange('property_manager_contact_ids')}
+                contactType="property_manager"
+                placeholder="Add property manager..."
+              />
+            </div>
             <FormMessage />
           </FormItem>
         )}
@@ -62,11 +100,29 @@ export function ContactsTab({ form }: ContactsTabProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Site Contacts</FormLabel>
-            <ContactSelect
-              value=""
-              onChange={handleContactChange('site_contact_ids')}
-              placeholder="Select site contact..."
-            />
+            <div className="space-y-2">
+              {(field.value || []).map((contactId: string) => (
+                <ContactSelect
+                  key={contactId}
+                  value={contactId}
+                  onChange={(newValue) => {
+                    const values = field.value || [];
+                    const index = values.indexOf(contactId);
+                    if (index !== -1) {
+                      const newValues = [...values];
+                      newValues[index] = newValue;
+                      field.onChange(newValues);
+                    }
+                  }}
+                  placeholder="Select site contact..."
+                />
+              ))}
+              <ContactSelect
+                value=""
+                onChange={handleContactChange('site_contact_ids')}
+                placeholder="Add site contact..."
+              />
+            </div>
             <FormMessage />
           </FormItem>
         )}

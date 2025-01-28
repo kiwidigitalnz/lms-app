@@ -36,12 +36,31 @@ export function PrimaryInsuranceDetails({ form }: PrimaryInsuranceDetailsProps) 
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Insurance Provider</FormLabel>
-                <ContactSelect
-                  value=""
-                  onChange={handleContactChange('insurance_provider_contact_ids')}
-                  contactType="supplier"
-                  placeholder="Select insurance provider..."
-                />
+                <div className="space-y-2">
+                  {(field.value || []).map((contactId: string) => (
+                    <ContactSelect
+                      key={contactId}
+                      value={contactId}
+                      onChange={(newValue) => {
+                        const values = field.value || [];
+                        const index = values.indexOf(contactId);
+                        if (index !== -1) {
+                          const newValues = [...values];
+                          newValues[index] = newValue;
+                          field.onChange(newValues);
+                        }
+                      }}
+                      contactType="supplier"
+                      placeholder="Select insurance provider..."
+                    />
+                  ))}
+                  <ContactSelect
+                    value=""
+                    onChange={handleContactChange('insurance_provider_contact_ids')}
+                    contactType="supplier"
+                    placeholder="Add insurance provider..."
+                  />
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -53,12 +72,31 @@ export function PrimaryInsuranceDetails({ form }: PrimaryInsuranceDetailsProps) 
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Insurance Broker</FormLabel>
-                <ContactSelect
-                  value=""
-                  onChange={handleContactChange('insurance_broker_contact_ids')}
-                  contactType="supplier"
-                  placeholder="Select insurance broker..."
-                />
+                <div className="space-y-2">
+                  {(field.value || []).map((contactId: string) => (
+                    <ContactSelect
+                      key={contactId}
+                      value={contactId}
+                      onChange={(newValue) => {
+                        const values = field.value || [];
+                        const index = values.indexOf(contactId);
+                        if (index !== -1) {
+                          const newValues = [...values];
+                          newValues[index] = newValue;
+                          field.onChange(newValues);
+                        }
+                      }}
+                      contactType="supplier"
+                      placeholder="Select insurance broker..."
+                    />
+                  ))}
+                  <ContactSelect
+                    value=""
+                    onChange={handleContactChange('insurance_broker_contact_ids')}
+                    contactType="supplier"
+                    placeholder="Add insurance broker..."
+                  />
+                </div>
                 <FormMessage />
               </FormItem>
             )}
