@@ -1,6 +1,7 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { User, Shield, Building2, Mail, Clock, Briefcase, Phone, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +12,7 @@ import { ProfileForm } from "@/components/profile/ProfileForm";
 import { SecurityForm } from "@/components/profile/SecurityForm";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
   const { user } = useAuth();
