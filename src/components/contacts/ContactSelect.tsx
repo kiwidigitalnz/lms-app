@@ -48,7 +48,7 @@ export function ContactSelect({
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [search, setSearch] = useState("");
 
-  const { data: contacts = [], refetch } = useQuery({
+  const { data: contacts = [], isLoading, refetch } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -70,6 +70,7 @@ export function ContactSelect({
   });
 
   const filteredContacts = contacts.filter(contact => {
+    if (!search) return true;
     const searchTerm = search.toLowerCase();
     const firstName = contact.first_name.toLowerCase();
     const lastName = (contact.last_name || "").toLowerCase();
@@ -102,6 +103,14 @@ export function ContactSelect({
     await refetch();
   };
 
+  if (isLoading) {
+    return (
+      <Button variant="outline" className="w-full justify-start">
+        Loading contacts...
+      </Button>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <Popover open={open} onOpenChange={setOpen}>
@@ -123,48 +132,53 @@ export function ContactSelect({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0" align="start">
-          <Command shouldFilter={false}>
+          <Command>
             <CommandInput 
               placeholder="Search contacts..." 
               value={search}
               onValueChange={setSearch}
             />
-            <CommandGroup>
-              {filteredContacts.map((contact) => (
+            {filteredContacts.length > 0 ? (
+              <CommandGroup>
+                {filteredContacts.map((contact) => (
+                  <CommandItem
+                    key={contact.id}
+                    value={contact.id}
+                    onSelect={handleSelect}
+                    className="cursor-pointer"
+                  >
+                    <Check
+                      className={`mr-2 h-4 w-4 ${
+                        contact.id === value ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                    {getContactLabel(contact)}
+                  </CommandItem>
+                ))}
                 <CommandItem
-                  key={contact.id}
-                  onSelect={() => handleSelect(contact.id)}
-                  className="cursor-pointer"
-                >
-                  <Check
-                    className={`mr-2 h-4 w-4 ${
-                      contact.id === value ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                  {getContactLabel(contact)}
-                </CommandItem>
-              ))}
-              <CommandItem
-                onSelect={() => handleSelect("create-new")}
-                className="cursor-pointer border-t"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create New Contact
-              </CommandItem>
-            </CommandGroup>
-            <CommandEmpty className="py-6 text-center text-sm">
-              No contacts found.
-              <div className="mt-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleSelect("create-new")}
+                  value="create-new"
+                  onSelect={handleSelect}
+                  className="cursor-pointer border-t"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Contact
-                </Button>
-              </div>
-            </CommandEmpty>
+                </CommandItem>
+              </CommandGroup>
+            ) : (
+              <CommandEmpty className="py-6 text-center text-sm">
+                No contacts found.
+                <div className="mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleSelect("create-new")}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create New Contact
+                  </Button>
+                </div>
+              </CommandEmpty>
+            )}
           </Command>
         </PopoverContent>
       </Popover>
