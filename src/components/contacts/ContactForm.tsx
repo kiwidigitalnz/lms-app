@@ -71,9 +71,17 @@ export function ContactForm({ onSuccess, initialData, mode = "create" }: Contact
         return;
       }
 
+      // Ensure all required fields are explicitly included
       const contactData = {
-        ...data,
         tenant_id: user.id,
+        first_name: data.first_name,
+        last_name: data.last_name || null,
+        company: data.company || null,
+        email: data.email || null,
+        phone: data.phone || null,
+        mobile: data.mobile || null,
+        contact_type: data.contact_type,
+        notes: data.notes || null,
       };
 
       if (mode === "create") {
