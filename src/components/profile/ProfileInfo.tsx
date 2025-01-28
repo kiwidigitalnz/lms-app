@@ -1,4 +1,4 @@
-import { Mail, Shield, Clock, Building2 } from "lucide-react";
+import { Mail, Shield, Clock, Briefcase } from "lucide-react";
 import { format } from "date-fns";
 
 interface ProfileInfoProps {
