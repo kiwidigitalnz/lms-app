@@ -48,7 +48,7 @@ export function ContactSelect({
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [search, setSearch] = useState("");
 
-  const { data: contacts = [], isLoading, refetch } = useQuery({
+  const { data: contacts, isLoading } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -65,11 +65,11 @@ export function ContactSelect({
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Contact[];
+      return (data || []) as Contact[];
     },
   });
 
-  const filteredContacts = contacts.filter(contact => {
+  const filteredContacts = contacts?.filter(contact => {
     if (!search) return true;
     const searchTerm = search.toLowerCase();
     const firstName = contact.first_name.toLowerCase();
@@ -79,9 +79,9 @@ export function ContactSelect({
     return firstName.includes(searchTerm) || 
            lastName.includes(searchTerm) || 
            company.includes(searchTerm);
-  });
+  }) || [];
 
-  const selectedContact = contacts.find((contact) => contact.id === value);
+  const selectedContact = contacts?.find((contact) => contact.id === value);
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
@@ -100,7 +100,6 @@ export function ContactSelect({
 
   const handleCreateSuccess = async () => {
     setShowCreateDialog(false);
-    await refetch();
   };
 
   if (isLoading) {
