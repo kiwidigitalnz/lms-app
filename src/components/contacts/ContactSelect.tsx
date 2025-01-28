@@ -49,6 +49,7 @@ export function ContactSelect({
 }: ContactSelectProps) {
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["contacts"],
@@ -100,6 +101,17 @@ export function ContactSelect({
     setIsCreateOpen(true);
   };
 
+  const filteredContacts = contacts.filter(contact => {
+    const searchTerm = search.toLowerCase();
+    const firstName = contact.first_name.toLowerCase();
+    const lastName = (contact.last_name || "").toLowerCase();
+    const company = (contact.company || "").toLowerCase();
+    
+    return firstName.includes(searchTerm) || 
+           lastName.includes(searchTerm) || 
+           company.includes(searchTerm);
+  });
+
   return (
     <div className="space-y-2">
       <div className="flex gap-2">
@@ -129,7 +141,11 @@ export function ContactSelect({
           </PopoverTrigger>
           <PopoverContent className="w-[400px] p-0">
             <Command>
-              <CommandInput placeholder="Search contacts..." />
+              <CommandInput 
+                placeholder="Search contacts..." 
+                value={search}
+                onValueChange={setSearch}
+              />
               <CommandList>
                 {isLoading ? (
                   <div className="py-6 text-center text-sm">
@@ -140,7 +156,7 @@ export function ContactSelect({
                   <div className="py-6 text-center text-sm text-destructive">
                     Error loading contacts. Please try again.
                   </div>
-                ) : contacts.length === 0 ? (
+                ) : filteredContacts.length === 0 ? (
                   <CommandEmpty className="py-6 text-center text-sm">
                     No contacts found.
                     <div className="mt-2">
@@ -156,10 +172,10 @@ export function ContactSelect({
                   </CommandEmpty>
                 ) : (
                   <CommandGroup>
-                    {contacts.map((contact) => (
+                    {filteredContacts.map((contact) => (
                       <CommandItem
                         key={contact.id}
-                        value={contact.id}
+                        value={getContactLabel(contact)}
                         onSelect={() => handleSelect(contact.id)}
                       >
                         <Check
