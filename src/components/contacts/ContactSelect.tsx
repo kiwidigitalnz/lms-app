@@ -73,8 +73,6 @@ export function ContactSelect({
     },
   });
 
-  // ... keep existing code (getContactLabel, handleSelect, removeContact functions)
-
   const contacts = data || [];
   const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
 
@@ -157,7 +155,10 @@ export function ContactSelect({
                       <CommandItem
                         key={contact.id}
                         value={contact.id}
-                        onSelect={() => handleSelect(contact.id)}
+                        onSelect={() => {
+                          handleSelect(contact.id);
+                          // Don't close the popover to allow multiple selections
+                        }}
                       >
                         <Check
                           className={cn(
