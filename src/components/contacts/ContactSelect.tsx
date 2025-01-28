@@ -48,7 +48,7 @@ export function ContactSelect({
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [search, setSearch] = useState("");
 
-  const { data: contacts, isLoading } = useQuery({
+  const { data: contacts = [], isLoading } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -65,11 +65,11 @@ export function ContactSelect({
 
       const { data, error } = await query;
       if (error) throw error;
-      return (data || []) as Contact[];
+      return data || [];
     },
   });
 
-  const filteredContacts = contacts?.filter(contact => {
+  const filteredContacts = contacts.filter(contact => {
     if (!search) return true;
     const searchTerm = search.toLowerCase();
     const firstName = contact.first_name.toLowerCase();
@@ -79,9 +79,9 @@ export function ContactSelect({
     return firstName.includes(searchTerm) || 
            lastName.includes(searchTerm) || 
            company.includes(searchTerm);
-  }) || [];
+  });
 
-  const selectedContact = contacts?.find((contact) => contact.id === value);
+  const selectedContact = contacts.find((contact) => contact.id === value);
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
@@ -98,7 +98,7 @@ export function ContactSelect({
     }
   };
 
-  const handleCreateSuccess = async () => {
+  const handleCreateSuccess = () => {
     setShowCreateDialog(false);
   };
 
@@ -131,19 +131,33 @@ export function ContactSelect({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0" align="start">
-          <Command>
-            <CommandInput 
-              placeholder="Search contacts..." 
-              value={search}
-              onValueChange={setSearch}
-            />
-            {filteredContacts.length > 0 ? (
+          {contacts.length === 0 ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              No contacts found.
+              <div className="mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleSelect("create-new")}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Contact
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Command>
+              <CommandInput 
+                placeholder="Search contacts..." 
+                value={search}
+                onValueChange={setSearch}
+              />
               <CommandGroup>
                 {filteredContacts.map((contact) => (
                   <CommandItem
                     key={contact.id}
                     value={contact.id}
-                    onSelect={handleSelect}
+                    onSelect={() => handleSelect(contact.id)}
                     className="cursor-pointer"
                   >
                     <Check
@@ -156,29 +170,30 @@ export function ContactSelect({
                 ))}
                 <CommandItem
                   value="create-new"
-                  onSelect={handleSelect}
+                  onSelect={() => handleSelect("create-new")}
                   className="cursor-pointer border-t"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Contact
                 </CommandItem>
               </CommandGroup>
-            ) : (
-              <CommandEmpty className="py-6 text-center text-sm">
-                No contacts found.
-                <div className="mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => handleSelect("create-new")}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create New Contact
-                  </Button>
-                </div>
-              </CommandEmpty>
-            )}
-          </Command>
+              {filteredContacts.length === 0 && (
+                <CommandEmpty className="py-6 text-center text-sm">
+                  No contacts found.
+                  <div className="mt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleSelect("create-new")}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create New Contact
+                    </Button>
+                  </div>
+                </CommandEmpty>
+              )}
+            </Command>
+          )}
         </PopoverContent>
       </Popover>
 
