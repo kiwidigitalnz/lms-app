@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ContactForm } from "../ContactForm";
+import { ContactForm } from "./ContactForm";
 import { Contact, ContactSelectProps } from "@/types/contact";
 import { ContactItem } from "./contact-select/ContactItem";
 import { EmptyState } from "./contact-select/EmptyState";
