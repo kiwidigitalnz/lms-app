@@ -16,6 +16,13 @@ interface PrimaryInsuranceDetailsProps {
 }
 
 export function PrimaryInsuranceDetails({ form }: PrimaryInsuranceDetailsProps) {
+  const handleContactChange = (fieldName: string) => (value: string) => {
+    const currentValue = form.getValues(fieldName as any) || [];
+    if (!currentValue.includes(value)) {
+      form.setValue(fieldName as any, [...currentValue, value]);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -30,8 +37,8 @@ export function PrimaryInsuranceDetails({ form }: PrimaryInsuranceDetailsProps) 
               <FormItem>
                 <FormLabel>Insurance Provider</FormLabel>
                 <ContactSelect
-                  value={field.value || []}
-                  onChange={field.onChange}
+                  value=""
+                  onChange={handleContactChange('insurance_provider_contact_ids')}
                   contactType="supplier"
                   placeholder="Select insurance provider..."
                 />
@@ -47,8 +54,8 @@ export function PrimaryInsuranceDetails({ form }: PrimaryInsuranceDetailsProps) 
               <FormItem>
                 <FormLabel>Insurance Broker</FormLabel>
                 <ContactSelect
-                  value={field.value || []}
-                  onChange={field.onChange}
+                  value=""
+                  onChange={handleContactChange('insurance_broker_contact_ids')}
                   contactType="supplier"
                   placeholder="Select insurance broker..."
                 />
