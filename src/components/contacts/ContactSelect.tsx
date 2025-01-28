@@ -51,8 +51,7 @@ export function ContactSelect({
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  // Fetch contacts using React Query
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -61,17 +60,22 @@ export function ContactSelect({
       let query = supabase
         .from("contacts")
         .select("id, first_name, last_name, company, contact_type")
-        .eq("tenant_id", user.id)
-        .order("first_name", { ascending: true });
+        .eq("tenant_id", user.id);
 
       if (contactType) {
         query = query.eq("contact_type", contactType);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as Contact[];
+      const { data: contacts, error } = await query;
+      
+      if (error) {
+        console.error("Error fetching contacts:", error);
+        throw error;
+      }
+
+      return contacts as Contact[];
     },
+    enabled: open, // Only fetch when the popover is open
   });
 
   const contacts = data || [];
@@ -129,6 +133,10 @@ export function ContactSelect({
                     <Loader2 className="mx-auto h-4 w-4 animate-spin" />
                     <p className="mt-2">Loading contacts...</p>
                   </div>
+                ) : error ? (
+                  <div className="py-6 text-center text-sm text-destructive">
+                    Error loading contacts. Please try again.
+                  </div>
                 ) : contacts.length === 0 ? (
                   <CommandEmpty className="py-6 text-center text-sm">
                     No contacts found.
@@ -148,9 +156,7 @@ export function ContactSelect({
                       <CommandItem
                         key={contact.id}
                         value={contact.id}
-                        onSelect={() => {
-                          handleSelect(contact.id);
-                        }}
+                        onSelect={() => handleSelect(contact.id)}
                       >
                         <Check
                           className={cn(
@@ -181,7 +187,7 @@ export function ContactSelect({
             <ContactForm 
               onSuccess={() => {
                 setIsCreateOpen(false);
-                refetch(); // Refresh the contacts list after creating a new contact
+                refetch();
               }}
               initialData={contactType ? { contact_type: contactType } : undefined}
             />
