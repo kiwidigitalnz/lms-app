@@ -58,11 +58,11 @@ export function ProfileInfo({
             </div>
             <div className="flex items-center gap-2 justify-end">
               <Mail className="h-4 w-4 text-muted-foreground" />
-              <span>{email}</span>
+              <span className="text-sm">{email}</span>
             </div>
             <div className="flex items-center gap-2 justify-end">
               <Phone className="h-4 w-4 text-muted-foreground" />
-              <span>{mobile || "No mobile number set"}</span>
+              <span className="text-sm">{mobile || "No mobile number set"}</span>
             </div>
           </div>
         </div>
