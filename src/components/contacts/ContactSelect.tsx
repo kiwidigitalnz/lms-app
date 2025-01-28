@@ -54,7 +54,10 @@ export function ContactSelect({
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
+      console.log("Fetching contacts...");
       const { data: { user } } = await supabase.auth.getUser();
+      console.log("Current user:", user);
+      
       if (!user) throw new Error("No user found");
 
       let query = supabase
@@ -63,6 +66,7 @@ export function ContactSelect({
         .eq("tenant_id", user.id);
 
       if (contactType) {
+        console.log("Filtering by contact type:", contactType);
         query = query.eq("contact_type", contactType);
       }
 
@@ -73,9 +77,10 @@ export function ContactSelect({
         throw error;
       }
 
+      console.log("Fetched contacts:", contacts);
       return contacts as Contact[];
     },
-    enabled: open, // Only fetch when the popover is open
+    enabled: open,
   });
 
   const contacts = data || [];
@@ -87,6 +92,7 @@ export function ContactSelect({
   };
 
   const handleSelect = (contactId: string) => {
+    console.log("Selecting contact:", contactId);
     const newValue = value.includes(contactId)
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
@@ -95,6 +101,11 @@ export function ContactSelect({
 
   const removeContact = (contactId: string) => {
     onChange(value.filter(id => id !== contactId));
+  };
+
+  const handleCreateClick = () => {
+    console.log("Opening create dialog");
+    setIsCreateOpen(true);
   };
 
   return (
@@ -141,10 +152,11 @@ export function ContactSelect({
                   <CommandEmpty className="py-6 text-center text-sm">
                     No contacts found.
                     <div className="mt-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setOpen(false);
-                        setIsCreateOpen(true);
-                      }}>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleCreateClick}
+                      >
                         <Plus className="mr-2 h-4 w-4" />
                         Create New Contact
                       </Button>
