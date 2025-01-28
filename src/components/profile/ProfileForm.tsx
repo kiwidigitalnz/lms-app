@@ -24,11 +24,14 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState(initialData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     try {
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('profiles')
         .update({
           first_name: formData.first_name,
@@ -38,23 +41,33 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
           mobile: formData.mobile,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user?.id);
+        .eq('id', user?.id)
+        .select();
 
       if (error) throw error;
 
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      if (!data || data.length === 0) {
+        throw new Error('No data returned from update operation');
+      }
+
+      // Invalidate and refetch profile data
+      await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      
       toast({
         title: "Success",
         description: "Profile updated successfully",
       });
+      
       onCancel();
     } catch (error) {
+      console.error("Error updating profile:", error);
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: "Failed to update profile. Please try again.",
         variant: "destructive",
       });
-      console.error("Error updating profile:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -97,11 +110,14 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         />
       </div>
       <div className="flex gap-2">
-        <Button type="submit">Save Changes</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Save Changes"}
+        </Button>
         <Button 
           type="button" 
           variant="outline"
           onClick={onCancel}
+          disabled={isSubmitting}
         >
           Cancel
         </Button>
