@@ -81,6 +81,8 @@ const Profile = () => {
             ) : (
               <div className="space-y-6">
                 <ProfileInfo 
+                  firstName={profile?.first_name}
+                  lastName={profile?.last_name}
                   email={profile?.email || user?.email}
                   role={userRole?.role}
                   createdAt={profile?.created_at}
