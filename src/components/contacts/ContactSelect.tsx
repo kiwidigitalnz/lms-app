@@ -83,6 +83,7 @@ export function ContactSelect({
       ? value.filter(id => id !== contactId)
       : [...value, contactId];
     onChange(newValue);
+    // Don't close the popover to allow multiple selections
   };
 
   const removeContact = (contactId: string) => {
@@ -92,6 +93,14 @@ export function ContactSelect({
   const handleCreateClick = () => {
     console.log("Opening create dialog");
     setIsCreateOpen(true);
+    // Don't close the popover, let the user decide when to close it
+  };
+
+  const handleCreateSuccess = () => {
+    setIsCreateOpen(false);
+    refetch().then(() => {
+      console.log("Contacts refetched after creation");
+    });
   };
 
   return (
@@ -144,10 +153,7 @@ export function ContactSelect({
               <DialogTitle>Add New Contact</DialogTitle>
             </DialogHeader>
             <ContactForm 
-              onSuccess={() => {
-                setIsCreateOpen(false);
-                refetch();
-              }}
+              onSuccess={handleCreateSuccess}
               contact_type={contactType}
             />
           </DialogContent>
