@@ -29,6 +29,7 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
+      console.error("No user found during profile update");
       toast({
         title: "Error",
         description: "You must be logged in to update your profile",
@@ -39,6 +40,7 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
     
     setIsSubmitting(true);
     console.log("Starting profile update with data:", formData);
+    console.log("User ID:", user.id);
 
     try {
       // Prepare update data with trimmed values
@@ -57,8 +59,10 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         .from('profiles')
         .update(updateData)
         .eq('id', user.id)
-        .select('*')
-        .single();
+        .select()
+        .maybeSingle();
+
+      console.log("Supabase response:", { error, data });
 
       if (error) {
         console.error("Supabase update error:", error);
@@ -66,10 +70,12 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
       }
 
       if (!data) {
+        console.error("No data returned from update operation");
         throw new Error('No data returned from update operation');
       }
 
       console.log("Profile updated successfully:", data);
+      console.log("Invalidating query with key:", ["profile", user.id]);
 
       // Immediately invalidate and refetch profile data
       await queryClient.invalidateQueries({ 
