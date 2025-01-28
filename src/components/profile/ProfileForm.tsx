@@ -38,6 +38,7 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
     }
     
     setIsSubmitting(true);
+    console.log("Submitting profile update:", formData); // Debug log
 
     try {
       const { error, data } = await supabase
@@ -51,19 +52,25 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
-        .select()
+        .select('*')
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error); // Debug log
+        throw error;
+      }
 
       if (!data) {
         throw new Error('No data returned from update operation');
       }
 
-      // Force a refetch of the profile data
+      console.log("Profile updated successfully:", data); // Debug log
+
+      // Force an immediate refetch of the profile data
       await queryClient.invalidateQueries({ 
         queryKey: ["profile", user.id],
-        exact: true 
+        exact: true,
+        refetchType: 'all'
       });
       
       toast({
