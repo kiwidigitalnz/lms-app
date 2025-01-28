@@ -31,19 +31,21 @@ interface ContactSelectProps {
   value?: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
+  contactType?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
 }
 
 export function ContactSelect({ 
   value = [], 
   onChange, 
-  placeholder = "Select contact..."
+  placeholder = "Select contact...",
+  contactType
 }: ContactSelectProps) {
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["contacts"],
+    queryKey: ["contacts", contactType],
     queryFn: async () => {
       console.log("Fetching contacts...");
       const { data: { user } } = await supabase.auth.getUser();
@@ -51,10 +53,16 @@ export function ContactSelect({
       
       if (!user) throw new Error("No user found");
 
-      const { data: contacts, error } = await supabase
+      let query = supabase
         .from("contacts")
         .select("id, first_name, last_name, company, contact_type")
         .eq("tenant_id", user.id);
+
+      if (contactType) {
+        query = query.eq("contact_type", contactType);
+      }
+
+      const { data: contacts, error } = await query;
       
       if (error) {
         console.error("Error fetching contacts:", error);
@@ -145,6 +153,7 @@ export function ContactSelect({
                 setIsCreateOpen(false);
                 refetch();
               }}
+              defaultContactType={contactType}
             />
           </DialogContent>
         </Dialog>
