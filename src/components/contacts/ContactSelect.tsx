@@ -51,7 +51,8 @@ export function ContactSelect({
   const [open, setOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { data, isLoading, isError } = useQuery({
+  // Fetch contacts using React Query
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["contacts", contactType],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -69,7 +70,7 @@ export function ContactSelect({
 
       const { data, error } = await query;
       if (error) throw error;
-      return (data || []) as Contact[];
+      return data as Contact[];
     },
   });
 
@@ -91,14 +92,6 @@ export function ContactSelect({
   const removeContact = (contactId: string) => {
     onChange(value.filter(id => id !== contactId));
   };
-
-  if (isError) {
-    return (
-      <div className="text-sm text-destructive">
-        Error loading contacts. Please try again.
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-2">
@@ -157,7 +150,6 @@ export function ContactSelect({
                         value={contact.id}
                         onSelect={() => {
                           handleSelect(contact.id);
-                          // Don't close the popover to allow multiple selections
                         }}
                       >
                         <Check
@@ -189,6 +181,7 @@ export function ContactSelect({
             <ContactForm 
               onSuccess={() => {
                 setIsCreateOpen(false);
+                refetch(); // Refresh the contacts list after creating a new contact
               }}
               initialData={contactType ? { contact_type: contactType } : undefined}
             />
