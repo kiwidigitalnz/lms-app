@@ -1,15 +1,6 @@
 import { useState } from "react";
-import { Check, ChevronsUpDown, Plus, Loader2, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ChevronsUpDown, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
@@ -22,10 +13,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { ContactForm } from "./ContactForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ContactSelectList } from "./ContactSelectList";
+import { SelectedContacts } from "./SelectedContacts";
 
 interface Contact {
   id: string;
@@ -38,7 +30,6 @@ interface Contact {
 interface ContactSelectProps {
   value?: string[];
   onChange: (value: string[]) => void;
-  contactType?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
   placeholder?: string;
 }
 
@@ -79,11 +70,6 @@ export function ContactSelect({
   const contacts = data || [];
   const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
 
-  const getContactLabel = (contact: Contact) => {
-    const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
-    return contact.company ? `${name} (${contact.company})` : name;
-  };
-
   const handleSelect = (contactId: string) => {
     console.log("Selecting contact:", contactId);
     const newValue = value.includes(contactId)
@@ -102,17 +88,6 @@ export function ContactSelect({
     setIsCreateOpen(true);
     setOpen(false);
   };
-
-  const filteredContacts = contacts.filter(contact => {
-    const searchTerm = search.toLowerCase();
-    const firstName = contact.first_name.toLowerCase();
-    const lastName = (contact.last_name || "").toLowerCase();
-    const company = (contact.company || "").toLowerCase();
-    
-    return firstName.includes(searchTerm) || 
-           lastName.includes(searchTerm) || 
-           company.includes(searchTerm);
-  });
 
   return (
     <div className="space-y-2">
@@ -142,56 +117,16 @@ export function ContactSelect({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[400px] p-0" align="start">
-            <Command>
-              <CommandInput 
-                placeholder="Search contacts..." 
-                value={search}
-                onValueChange={setSearch}
-              />
-              <CommandList>
-                {isLoading ? (
-                  <div className="py-6 text-center text-sm">
-                    <Loader2 className="mx-auto h-4 w-4 animate-spin" />
-                    <p className="mt-2">Loading contacts...</p>
-                  </div>
-                ) : error ? (
-                  <div className="py-6 text-center text-sm text-destructive">
-                    Error loading contacts. Please try again.
-                  </div>
-                ) : filteredContacts.length === 0 ? (
-                  <CommandEmpty className="py-6 text-center text-sm">
-                    No contacts found.
-                    <div className="mt-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleCreateClick}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create New Contact
-                      </Button>
-                    </div>
-                  </CommandEmpty>
-                ) : (
-                  <CommandGroup>
-                    {filteredContacts.map((contact) => (
-                      <CommandItem
-                        key={contact.id}
-                        onSelect={() => handleSelect(contact.id)}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            value.includes(contact.id) ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {getContactLabel(contact)}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                )}
-              </CommandList>
-            </Command>
+            <ContactSelectList
+              contacts={contacts}
+              selectedIds={value}
+              isLoading={isLoading}
+              error={error as Error}
+              searchTerm={search}
+              onSearchChange={setSearch}
+              onSelect={handleSelect}
+              onCreateClick={handleCreateClick}
+            />
           </PopoverContent>
         </Popover>
 
@@ -216,20 +151,10 @@ export function ContactSelect({
       </div>
 
       {selectedContacts.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {selectedContacts.map((contact) => (
-            <Badge key={contact.id} variant="secondary">
-              {getContactLabel(contact)}
-              <button
-                className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                onClick={() => removeContact(contact.id)}
-              >
-                <X className="h-3 w-3" />
-                <span className="sr-only">Remove</span>
-              </button>
-            </Badge>
-          ))}
-        </div>
+        <SelectedContacts
+          contacts={selectedContacts}
+          onRemove={removeContact}
+        />
       )}
     </div>
   );
