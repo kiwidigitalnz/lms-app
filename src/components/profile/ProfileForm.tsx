@@ -12,6 +12,7 @@ interface ProfileFormData {
   company: string;
   job_title: string;
   mobile: string;
+  email: string;
 }
 
 interface ProfileFormProps {
@@ -30,7 +31,15 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update(formData)
+        .update({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          company: formData.company,
+          job_title: formData.job_title,
+          mobile: formData.mobile,
+          email: formData.email,
+          updated_at: new Date().toISOString(),
+        })
         .eq('id', user?.id);
 
       if (error) throw error;
@@ -65,6 +74,14 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         <Input
           value={formData.last_name}
           onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+        />
+      </div>
+      <div className="grid gap-1">
+        <label className="text-sm font-medium">Email</label>
+        <Input
+          value={formData.email}
+          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+          type="email"
         />
       </div>
       <div className="grid gap-1">

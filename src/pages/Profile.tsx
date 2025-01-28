@@ -1,5 +1,5 @@
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Shield, Building2, Mail, Clock, Briefcase, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -77,6 +77,7 @@ const Profile = () => {
                   company: profile?.company || "",
                   job_title: profile?.job_title || "",
                   mobile: profile?.mobile || "",
+                  email: profile?.email || "",
                 }}
                 onCancel={() => setIsEditing(false)}
               />
@@ -100,7 +101,7 @@ const Profile = () => {
                 <div className="grid gap-6">
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{user?.email}</span>
+                    <span className="text-sm">{profile?.email || user?.email}</span>
                   </div>
 
                   <div className="flex items-center gap-2">
