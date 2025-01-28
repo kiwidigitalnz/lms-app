@@ -24,15 +24,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Initialize session and set up auth state listener
     const initializeAuth = async () => {
       try {
-        // Get initial session
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
 
-        // Set up auth state change subscription
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (_event, currentSession) => {
             setSession(currentSession);
@@ -53,7 +50,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
   }, []);
 
-  // Fetch user role when user changes
   useEffect(() => {
     async function getUserRole() {
       if (user) {
@@ -78,10 +74,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getUserRole();
   }, [user]);
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const signIn = async (email: string, password: string) => {
     try {
+      if (!validateEmail(email)) {
+        throw new Error("Please enter a valid email address");
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
@@ -101,8 +106,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     lastName: string
   ) => {
     try {
+      if (!validateEmail(email)) {
+        throw new Error("Please enter a valid email address");
+      }
+
       const { error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
           data: {
