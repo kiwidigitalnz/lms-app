@@ -16,7 +16,6 @@ import { ContactForm } from "./ContactForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ContactSelectList } from "./ContactSelectList";
-import { SelectedContacts } from "./SelectedContacts";
 
 interface Contact {
   id: string;
@@ -27,16 +26,16 @@ interface Contact {
 }
 
 interface ContactSelectProps {
-  value?: string[];
-  onChange: (value: string[]) => void;
+  value?: string;
+  onChange: (value: string) => void;
   placeholder?: string;
   contactType?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
 }
 
 export function ContactSelect({ 
-  value = [], 
+  value, 
   onChange, 
-  placeholder = "Select contact...",
+  placeholder = "Search contacts...",
   contactType
 }: ContactSelectProps) {
   const [open, setOpen] = useState(false);
@@ -63,13 +62,11 @@ export function ContactSelect({
     },
   });
 
-  const selectedContacts = contacts.filter((contact) => value.includes(contact.id));
+  const selectedContact = contacts.find((contact) => contact.id === value);
 
   const handleSelect = (contactId: string) => {
-    const newValue = value.includes(contactId)
-      ? value.filter(id => id !== contactId)
-      : [...value, contactId];
-    onChange(newValue);
+    onChange(contactId);
+    setOpen(false);
   };
 
   const handleCreateSuccess = async () => {
@@ -82,6 +79,11 @@ export function ContactSelect({
     setShowCreateDialog(true);
   };
 
+  const getContactLabel = (contact: Contact) => {
+    const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
+    return contact.company ? `${name} (${contact.company})` : name;
+  };
+
   return (
     <div className="space-y-2">
       <Popover open={open} onOpenChange={setOpen}>
@@ -92,9 +94,9 @@ export function ContactSelect({
             aria-expanded={open}
             className="w-full justify-between"
           >
-            {selectedContacts.length > 0 ? (
+            {selectedContact ? (
               <span className="truncate">
-                {`${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'} selected`}
+                {getContactLabel(selectedContact)}
               </span>
             ) : (
               placeholder
@@ -105,20 +107,13 @@ export function ContactSelect({
         <PopoverContent className="w-[400px] p-0" align="start">
           <ContactSelectList
             contacts={contacts}
-            selectedIds={value}
+            selectedIds={value ? [value] : []}
             onSelect={handleSelect}
             onCreateNew={handleCreateNew}
             contactType={contactType}
           />
         </PopoverContent>
       </Popover>
-
-      {selectedContacts.length > 0 && (
-        <SelectedContacts
-          contacts={selectedContacts}
-          onRemove={handleSelect}
-        />
-      )}
 
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent>
