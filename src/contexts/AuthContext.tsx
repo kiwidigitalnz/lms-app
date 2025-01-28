@@ -26,18 +26,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
-        setSession(initialSession);
-        setUser(initialSession?.user ?? null);
+        // Get initial session
+        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Error getting initial session:", sessionError);
+          setLoading(false);
+          return;
+        }
 
+        if (initialSession) {
+          setSession(initialSession);
+          setUser(initialSession.user);
+        }
+
+        // Set up auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          async (_event, currentSession) => {
-            setSession(currentSession);
-            setUser(currentSession?.user ?? null);
+          async (event, currentSession) => {
+            console.log("Auth state changed:", event);
+            
+            if (event === 'TOKEN_REFRESHED') {
+              setSession(currentSession);
+              setUser(currentSession?.user ?? null);
+            } else if (event === 'SIGNED_IN') {
+              setSession(currentSession);
+              setUser(currentSession?.user ?? null);
+              navigate('/');
+            } else if (event === 'SIGNED_OUT') {
+              setSession(null);
+              setUser(null);
+              setUserRole(null);
+              navigate('/auth');
+            }
+            
             setLoading(false);
           }
         );
 
+        // Cleanup subscription
         return () => {
           subscription.unsubscribe();
         };
@@ -48,7 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     initializeAuth();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     async function getUserRole() {
@@ -91,7 +117,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
-      navigate("/");
       toast.success("Successfully signed in!");
     } catch (error: any) {
       toast.error(error.message);
@@ -133,7 +158,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate("/auth");
       toast.success("Successfully signed out!");
     } catch (error: any) {
       toast.error(error.message);
