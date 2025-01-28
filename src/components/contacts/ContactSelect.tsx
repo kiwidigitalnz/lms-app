@@ -39,7 +39,8 @@ export function ContactSelect({
   placeholder = "Select contact...",
   contactType
 }: ContactSelectProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   const { data: contacts = [], refetch } = useQuery({
     queryKey: ["contacts", contactType],
@@ -71,42 +72,46 @@ export function ContactSelect({
     onChange(newValue);
   };
 
-  const handleCreateSuccess = () => {
-    refetch();
+  const handleCreateSuccess = async () => {
+    await refetch();
+    setShowCreateDialog(false);
+  };
+
+  const handleCreateNew = () => {
+    setOpen(false); // Close the popover
+    setShowCreateDialog(true); // Open the create dialog
   };
 
   return (
     <div className="space-y-2">
-      <div className="flex gap-2">
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={isOpen}
-              className="w-full justify-between"
-            >
-              {selectedContacts.length > 0 ? (
-                <span className="truncate">
-                  {`${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'} selected`}
-                </span>
-              ) : (
-                placeholder
-              )}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[400px] p-0" align="start">
-            <ContactSelectList
-              contacts={contacts}
-              selectedIds={value}
-              onSelect={handleSelect}
-              onCreateSuccess={handleCreateSuccess}
-              contactType={contactType}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+          >
+            {selectedContacts.length > 0 ? (
+              <span className="truncate">
+                {`${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'} selected`}
+              </span>
+            ) : (
+              placeholder
+            )}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[400px] p-0" align="start">
+          <ContactSelectList
+            contacts={contacts}
+            selectedIds={value}
+            onSelect={handleSelect}
+            onCreateNew={handleCreateNew}
+            contactType={contactType}
+          />
+        </PopoverContent>
+      </Popover>
 
       {selectedContacts.length > 0 && (
         <SelectedContacts
@@ -114,6 +119,18 @@ export function ContactSelect({
           onRemove={handleSelect}
         />
       )}
+
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Contact</DialogTitle>
+          </DialogHeader>
+          <ContactForm 
+            onSuccess={handleCreateSuccess}
+            contact_type={contactType}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

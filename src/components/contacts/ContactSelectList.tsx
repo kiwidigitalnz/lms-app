@@ -10,13 +10,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { ContactForm } from "./ContactForm";
 
 interface Contact {
   id: string;
@@ -29,7 +22,7 @@ interface ContactSelectListProps {
   contacts: Contact[];
   selectedIds: string[];
   onSelect: (contactId: string) => void;
-  onCreateSuccess: () => void;
+  onCreateNew: () => void;
   contactType?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
 }
 
@@ -37,11 +30,10 @@ export function ContactSelectList({
   contacts,
   selectedIds,
   onSelect,
-  onCreateSuccess,
+  onCreateNew,
   contactType,
 }: ContactSelectListProps) {
   const [search, setSearch] = useState("");
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const getContactLabel = (contact: Contact) => {
     const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
@@ -59,71 +51,54 @@ export function ContactSelectList({
            company.includes(searchTerm);
   });
 
-  const handleCreateClick = () => {
-    setIsCreateOpen(true);
-  };
-
-  const handleCreateSuccess = () => {
-    setIsCreateOpen(false);
-    onCreateSuccess();
-  };
-
   return (
-    <>
-      <Command shouldFilter={false}>
-        <CommandInput 
-          placeholder="Search contacts..." 
-          value={search}
-          onValueChange={setSearch}
-        />
-        <CommandList>
-          {filteredContacts.length === 0 ? (
-            <CommandEmpty className="py-6 text-center text-sm">
-              No contacts found.
-              <div className="mt-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleCreateClick}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create New Contact
-                </Button>
-              </div>
-            </CommandEmpty>
-          ) : (
-            <CommandGroup>
-              {filteredContacts.map((contact) => (
-                <CommandItem
-                  key={contact.id}
-                  onSelect={() => onSelect(contact.id)}
-                  className="cursor-pointer"
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedIds.includes(contact.id) ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {getContactLabel(contact)}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+    <Command shouldFilter={false}>
+      <CommandInput 
+        placeholder="Search contacts..." 
+        value={search}
+        onValueChange={setSearch}
+      />
+      <CommandList>
+        <CommandEmpty className="py-6 text-center text-sm">
+          No contacts found.
+          <div className="mt-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onCreateNew}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Contact
+            </Button>
+          </div>
+        </CommandEmpty>
+        <CommandGroup>
+          {filteredContacts.map((contact) => (
+            <CommandItem
+              key={contact.id}
+              onSelect={() => onSelect(contact.id)}
+              className="cursor-pointer"
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  selectedIds.includes(contact.id) ? "opacity-100" : "opacity-0"
+                )}
+              />
+              {getContactLabel(contact)}
+            </CommandItem>
+          ))}
+          {filteredContacts.length > 0 && (
+            <CommandItem
+              onSelect={onCreateNew}
+              className="cursor-pointer border-t"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Contact
+            </CommandItem>
           )}
-        </CommandList>
-      </Command>
-
-      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Contact</DialogTitle>
-          </DialogHeader>
-          <ContactForm 
-            onSuccess={handleCreateSuccess}
-            contact_type={contactType}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 }
