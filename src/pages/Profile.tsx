@@ -1,19 +1,23 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Shield, Building2, Mail, Clock, Briefcase, Phone } from "lucide-react";
+import { User, Shield, Building2, Mail, Clock, Briefcase, Phone, Lock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
+import { SecurityForm } from "@/components/profile/SecurityForm";
 import { format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 
 const Profile = () => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const { toast } = useToast();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
@@ -45,6 +49,27 @@ const Profile = () => {
     enabled: !!user,
   });
 
+  const handleEmailUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.auth.updateUser({ email: newEmail });
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Please check your email to confirm the change",
+      });
+      setIsEditingEmail(false);
+      setNewEmail("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -57,6 +82,7 @@ const Profile = () => {
       description="Manage your profile settings"
     >
       <div className="max-w-3xl mx-auto space-y-8">
+        {/* Profile Card */}
         <Card className="overflow-hidden">
           <div className="relative h-32 bg-gradient-to-r from-primary/10 to-primary/5">
             <div className="absolute -bottom-12 left-6">
@@ -131,6 +157,79 @@ const Profile = () => {
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Security Card */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-xl font-semibold">Security Settings</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your email and password
+                  </p>
+                </div>
+                <Lock className="h-5 w-5 text-muted-foreground" />
+              </div>
+
+              <Separator />
+
+              {/* Email Update Section */}
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h4 className="font-medium">Email Address</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Change your email address
+                  </p>
+                </div>
+
+                {isEditingEmail ? (
+                  <form onSubmit={handleEmailUpdate} className="space-y-4">
+                    <div className="grid gap-1">
+                      <label className="text-sm font-medium">New Email</label>
+                      <Input
+                        type="email"
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button type="submit">Save Email</Button>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setIsEditingEmail(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditingEmail(true)}
+                  >
+                    Change Email
+                  </Button>
+                )}
+              </div>
+
+              <Separator />
+
+              {/* Password Update Section */}
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h4 className="font-medium">Password</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Change your password
+                  </p>
+                </div>
+                <SecurityForm />
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
