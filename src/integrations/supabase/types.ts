@@ -317,10 +317,17 @@ export type Database = {
           green_star_rating: number | null
           hvac_system_type: string | null
           id: string
+          insurance_broker_contact_ids: string[] | null
           insurance_coverage_amount: number | null
+          insurance_excess_amount: number | null
+          insurance_liability_amount: number | null
           insurance_notes: string | null
           insurance_policy_number: string | null
+          insurance_premium_amount: number | null
           insurance_provider: string | null
+          insurance_renewal_date: string | null
+          insurance_renewal_reminder: boolean | null
+          insurance_start_date: string | null
           last_building_wof_date: string | null
           nabersnz_rating: string | null
           name: string
@@ -357,10 +364,17 @@ export type Database = {
           green_star_rating?: number | null
           hvac_system_type?: string | null
           id?: string
+          insurance_broker_contact_ids?: string[] | null
           insurance_coverage_amount?: number | null
+          insurance_excess_amount?: number | null
+          insurance_liability_amount?: number | null
           insurance_notes?: string | null
           insurance_policy_number?: string | null
+          insurance_premium_amount?: number | null
           insurance_provider?: string | null
+          insurance_renewal_date?: string | null
+          insurance_renewal_reminder?: boolean | null
+          insurance_start_date?: string | null
           last_building_wof_date?: string | null
           nabersnz_rating?: string | null
           name: string
@@ -397,10 +411,17 @@ export type Database = {
           green_star_rating?: number | null
           hvac_system_type?: string | null
           id?: string
+          insurance_broker_contact_ids?: string[] | null
           insurance_coverage_amount?: number | null
+          insurance_excess_amount?: number | null
+          insurance_liability_amount?: number | null
           insurance_notes?: string | null
           insurance_policy_number?: string | null
+          insurance_premium_amount?: number | null
           insurance_provider?: string | null
+          insurance_renewal_date?: string | null
+          insurance_renewal_reminder?: boolean | null
+          insurance_start_date?: string | null
           last_building_wof_date?: string | null
           nabersnz_rating?: string | null
           name?: string
