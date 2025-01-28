@@ -9,6 +9,7 @@ import { useState } from "react";
 import { ProfileAvatar } from "@/components/profile/ProfileAvatar";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { format } from "date-fns";
+import { Separator } from "@/components/ui/separator";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -55,16 +56,10 @@ const Profile = () => {
       title="Profile" 
       description="Manage your profile settings"
     >
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Profile Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center mb-6">
+      <div className="max-w-3xl mx-auto space-y-8">
+        <Card className="overflow-hidden">
+          <div className="relative h-32 bg-gradient-to-r from-primary/10 to-primary/5">
+            <div className="absolute -bottom-12 left-6">
               <ProfileAvatar 
                 avatarUrl={profile?.avatar_url}
                 initials={initials}
@@ -72,7 +67,8 @@ const Profile = () => {
                 editable
               />
             </div>
-
+          </div>
+          <CardContent className="pt-16 pb-6">
             {isEditing ? (
               <ProfileForm
                 initialData={{
@@ -84,55 +80,43 @@ const Profile = () => {
               />
             ) : (
               <div className="space-y-6">
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    Email
-                  </div>
-                  <p className="text-sm">{user?.email}</p>
+                <div>
+                  <h2 className="text-2xl font-semibold">
+                    {profile?.first_name} {profile?.last_name}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {profile?.company || "No company set"}
+                  </p>
                 </div>
                 
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <User className="h-4 w-4" />
-                    Name
+                <Separator />
+                
+                <div className="grid gap-6">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">{user?.email}</span>
                   </div>
-                  <p className="text-sm">
-                    {profile?.first_name} {profile?.last_name}
-                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm capitalize">
+                      {userRole?.role?.replace('_', ' ') || "No role assigned"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">
+                      Member since {profile?.created_at ? format(new Date(profile.created_at), 'PPP') : "Unknown"}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <Building2 className="h-4 w-4" />
-                    Company
-                  </div>
-                  <p className="text-sm">
-                    {profile?.company || "Not set"}
-                  </p>
+                <div className="pt-4">
+                  <Button onClick={() => setIsEditing(true)}>
+                    Edit Profile
+                  </Button>
                 </div>
-
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <Shield className="h-4 w-4" />
-                    Role
-                  </div>
-                  <p className="text-sm capitalize">
-                    {userRole?.role?.replace('_', ' ') || "No role assigned"}
-                  </p>
-                </div>
-
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    Member Since
-                  </div>
-                  <p className="text-sm">
-                    {profile?.created_at ? format(new Date(profile.created_at), 'PPP') : "Unknown"}
-                  </p>
-                </div>
-
-                <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
               </div>
             )}
           </CardContent>
