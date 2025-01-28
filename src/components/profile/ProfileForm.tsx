@@ -28,7 +28,14 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to update your profile",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsSubmitting(true);
 
@@ -36,11 +43,11 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
       const { error, data } = await supabase
         .from('profiles')
         .update({
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          company: formData.company,
-          job_title: formData.job_title,
-          mobile: formData.mobile,
+          first_name: formData.first_name.trim(),
+          last_name: formData.last_name.trim(),
+          company: formData.company.trim(),
+          job_title: formData.job_title.trim(),
+          mobile: formData.mobile.trim(),
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
@@ -53,8 +60,11 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         throw new Error('No data returned from update operation');
       }
 
-      // Ensure the query is properly invalidated
-      await queryClient.invalidateQueries({ queryKey: ["profile", user.id] });
+      // Force a refetch of the profile data
+      await queryClient.invalidateQueries({ 
+        queryKey: ["profile", user.id],
+        exact: true 
+      });
       
       toast({
         title: "Success",
@@ -62,11 +72,11 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
       });
       
       onCancel();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating profile:", error);
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: error.message || "Failed to update profile. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -81,6 +91,7 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         <Input
           value={formData.first_name}
           onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
+          required
         />
       </div>
       <div className="grid gap-1">
@@ -88,6 +99,7 @@ export function ProfileForm({ initialData, onCancel }: ProfileFormProps) {
         <Input
           value={formData.last_name}
           onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
+          required
         />
       </div>
       <div className="grid gap-1">

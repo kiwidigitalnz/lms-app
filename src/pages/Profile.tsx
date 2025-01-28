@@ -10,19 +10,23 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { SecuritySection } from "@/components/profile/SecuritySection";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, error } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async () => {
+      if (!user?.id) throw new Error("No user ID available");
+
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("id", user?.id)
-        .single();
+        .eq("id", user.id)
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching profile:", error);
@@ -35,26 +39,60 @@ const Profile = () => {
 
       return data;
     },
-    enabled: !!user,
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    retry: 2,
   });
 
   const { data: userRole } = useQuery({
     queryKey: ["user-role", user?.id],
     queryFn: async () => {
+      if (!user?.id) throw new Error("No user ID available");
+
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", user?.id)
-        .single();
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching user role:", error);
+        throw error;
+      }
+
       return data;
     },
-    enabled: !!user,
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    retry: 2,
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <AppLayout title="Profile" description="Loading...">
+        <div className="max-w-3xl mx-auto">
+          <Card>
+            <CardContent className="pt-6">
+              <div>Loading profile...</div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AppLayout title="Profile" description="Error">
+        <div className="max-w-3xl mx-auto">
+          <Card>
+            <CardContent className="pt-6">
+              <div>Error loading profile. Please try refreshing the page.</div>
+            </CardContent>
+          </Card>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
