@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Check, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
+  CommandItem,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -18,14 +19,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ContactForm } from "./ContactForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ContactForm } from "./ContactForm";
-import { Contact, ContactSelectProps } from "@/types/contact";
-import { ContactItem } from "./contact-select/ContactItem";
-import { EmptyState } from "./contact-select/EmptyState";
-import { CreateNewButton } from "./contact-select/CreateNewButton";
-import { filterContacts, getContactLabel } from "./utils/contactUtils";
+
+interface Contact {
+  id: string;
+  first_name: string;
+  last_name: string | null;
+  company: string | null;
+  contact_type: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
+}
+
+interface ContactSelectProps {
+  value?: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  contactType?: "landlord" | "property_manager" | "supplier" | "tenant" | "other";
+}
 
 export function ContactSelect({ 
   value, 
@@ -58,8 +69,24 @@ export function ContactSelect({
     },
   });
 
-  const filteredContacts = filterContacts(contacts, search);
+  const filteredContacts = contacts.filter(contact => {
+    if (!search) return true;
+    const searchTerm = search.toLowerCase();
+    const firstName = contact.first_name.toLowerCase();
+    const lastName = (contact.last_name || "").toLowerCase();
+    const company = (contact.company || "").toLowerCase();
+    
+    return firstName.includes(searchTerm) || 
+           lastName.includes(searchTerm) || 
+           company.includes(searchTerm);
+  });
+
   const selectedContact = contacts.find((contact) => contact.id === value);
+
+  const getContactLabel = (contact: Contact) => {
+    const name = `${contact.first_name} ${contact.last_name || ""}`.trim();
+    return contact.company ? `${name} (${contact.company})` : name;
+  };
 
   const handleSelect = (contactId: string) => {
     if (contactId === "create-new") {
@@ -105,7 +132,19 @@ export function ContactSelect({
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0" align="start">
           {contacts.length === 0 ? (
-            <EmptyState onCreateNew={() => handleSelect("create-new")} />
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              No contacts found.
+              <div className="mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleSelect("create-new")}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Contact
+                </Button>
+              </div>
+            </div>
           ) : (
             <Command>
               <CommandInput 
@@ -115,18 +154,42 @@ export function ContactSelect({
               />
               <CommandGroup>
                 {filteredContacts.map((contact) => (
-                  <ContactItem
+                  <CommandItem
                     key={contact.id}
-                    contact={contact}
-                    isSelected={contact.id === value}
-                    onSelect={handleSelect}
-                  />
+                    value={contact.id}
+                    onSelect={() => handleSelect(contact.id)}
+                    className="cursor-pointer"
+                  >
+                    <Check
+                      className={`mr-2 h-4 w-4 ${
+                        contact.id === value ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                    {getContactLabel(contact)}
+                  </CommandItem>
                 ))}
-                <CreateNewButton onSelect={() => handleSelect("create-new")} />
+                <CommandItem
+                  value="create-new"
+                  onSelect={() => handleSelect("create-new")}
+                  className="cursor-pointer border-t"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create New Contact
+                </CommandItem>
               </CommandGroup>
               {filteredContacts.length === 0 && (
                 <CommandEmpty className="py-6 text-center text-sm">
-                  <EmptyState onCreateNew={() => handleSelect("create-new")} />
+                  No contacts found.
+                  <div className="mt-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleSelect("create-new")}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create New Contact
+                    </Button>
+                  </div>
                 </CommandEmpty>
               )}
             </Command>
